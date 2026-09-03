@@ -21,7 +21,7 @@ WHITE = RGBColor(0xF8, 0xFA, 0xFC)
 MUTED = RGBColor(0x94, 0xA3, 0xB8)
 SOFT = RGBColor(0xCB, 0xD5, 0xE1)
 FONT = "Microsoft YaHei"
-TOTAL = 12
+TOTAL = 13
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -88,6 +88,11 @@ def bg(slide):
     rect(slide, 0, 0, W, H, BG)
 
 
+def hide(slide):
+    """PowerPoint show=0：幻灯片放映时隐藏。"""
+    slide._element.set("show", "0")
+
+
 def footer(slide, page, section=""):
     rect(slide, 0, Inches(7.28), W, Inches(0.22), RGBColor(0x08, 0x0D, 0x16))
     put(
@@ -146,7 +151,7 @@ def build():
     put(s, Inches(0.7), Inches(6.7), Inches(8), Inches(0.3), "2026  ·  蓝图", 13, MUTED)
     put(s, Inches(10.3), Inches(6.7), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 13, MUTED, align=PP_ALIGN.RIGHT)
 
-    # ========== 2 请拍板 ==========
+    # ========== 2 请拍板（隐藏） ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "0  请拍板", "立项只拍三件事，其余都是证据",
@@ -170,6 +175,7 @@ def build():
         put(s, left + Inches(0.3), Inches(2.15), Inches(3.65), Inches(2.2), a, 16, WHITE)
         put(s, left + Inches(0.3), Inches(4.5), Inches(3.65), Inches(1.5), b, 14, SOFT)
     footer(s, 2, "拍板")
+    hide(s)
 
     # ========== 3 规格 ==========
     s = prs.slides.add_slide(blank)
@@ -213,9 +219,9 @@ def build():
            "四条公开结果。汇报时只念标题，细节留问答。")
     facts = [
         ("雷达能进大模型", "HoloLLM：mmWave 注入 VLM，人体感知最高 +30%。"),
-        ("EMG 已开卖，仍要试戴", "Meta Neural Band 2025-09 开卖，近 20 万人训练。"),
-        ("IMU 必须自有塔", "Babel：ImageBind 对 IMU 几乎无效。"),
-        ("EMG / 雷达同样", "LIMU-BERT 已上移动端。"),
+        ("EMG 已开卖，仍要试戴", "Meta Neural Band 2025-09 开卖，近 20 万人体验。"),
+        ("IMU 如何对齐其他模态", "Babel：ImageBind 对 IMU 几乎无效。"),
+        ("IMU 预训练模型", "LIMU-BERT：手机上可实时跑。"),
     ]
     for i, (t, d) in enumerate(facts):
         r, c = divmod(i, 2)
@@ -309,11 +315,40 @@ def build():
         put(s, Inches(0.7), top + Inches(0.7), Inches(12.0), Inches(0.65), a, 16, SOFT)
     footer(s, 7, "对标")
 
-    # ========== 8 四场景对照 ==========
+    # ========== 8 TOP3 团队 ==========
+    s = prs.slides.add_slide(blank)
+    bg(s)
+    header(s, "4  TOP3 团队", "抄架构，不抄产品；三家各对应一座塔",
+           "标准：把非视听文传感器当一等模态，且有可复用表征。")
+    teams = [
+        (GREEN, "1  港科大 Mo Li",
+         "LIMU-BERT → Babel",
+         "IMU 自监督基础模型；\nWi‑Fi / 雷达 / IMU / LiDAR\n可扩展对齐，不必全配对。",
+         "我们抄：分模态塔 +\n可追加对齐。"),
+        (CYAN, "2  南洋理工 MARS",
+         "HoloLLM",
+         "把 mmWave / LiDAR / 红外\n注入 VLM；稀有模态注入器，\n不幻想万能 ViT。",
+         "我们抄：雷达塔接入 +\n异构注入器。"),
+        (AMBER, "3  Meta FAIR / Reality",
+         "DIGIT · Sparsh · Neural Band",
+         "触觉工具化（Plexus）；\n腕带 EMG 已开卖，\n仍强制店内试戴。",
+         "我们抄：工具化形态 +\nEMG 塔与接触几何。"),
+    ]
+    for i, (c, name, work, what, so) in enumerate(teams):
+        left = Inches(0.4 + i * 4.3)
+        box(s, left, Inches(1.32), Inches(4.15), Inches(4.95), CARD, STROKE)
+        rect(s, left, Inches(1.32), Inches(0.12), Inches(4.95), c)
+        put(s, left + Inches(0.3), Inches(1.5), Inches(3.65), Inches(0.4), name, 16, c, True)
+        put(s, left + Inches(0.3), Inches(2.0), Inches(3.65), Inches(0.4), work, 14, AMBER, True)
+        put(s, left + Inches(0.3), Inches(2.55), Inches(3.65), Inches(1.8), what, 14, SOFT)
+        put(s, left + Inches(0.3), Inches(4.5), Inches(3.65), Inches(1.5), so, 14, WHITE, True)
+    footer(s, 8, "团队")
+
+    # ========== 9 四场景对照 ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "5  商用场景", "四件事倒逼四座塔：雷达 · IMU · EMG · UWB",
-           "汇报只讲这一页。先打中间这一列。细证据在附录，被问再翻。")
+           "汇报只讲这一页。先打生命体征。细证据在附录，被问再翻。")
     scenes = [
         ("眼镜写字 / 微手势",
          ["手在桌下也能写、口袋里也能点", "眼镜 OEM / XR", "手在桌下、口袋里，会议室不能出声", "加 EMG：微点 / 写字可用", "EMG 塔 + 对比表"]),
@@ -337,9 +372,9 @@ def build():
         for j, (_, cells) in enumerate(scenes):
             put(s, Inches(2.8 + j * 2.55), top, Inches(2.4), Inches(0.82), cells[i], 13, WHITE,
                 valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 8, "场景")
+    footer(s, 9, "场景")
 
-    # ========== 9 先打生命体征 ==========
+    # ========== 10 先打生命体征 ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "5  先打哪", "无接触生命体征：90 天证明「加雷达，被子里才有读数」",
@@ -373,9 +408,9 @@ def build():
         "不交\n"
         "医疗级心率、眼镜整机、开锁产品、语言头",
         15, SOFT)
-    footer(s, 9, "第一包")
+    footer(s, 10, "第一包")
 
-    # ========== 10 路线 ==========
+    # ========== 11 路线（隐藏） ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "6  怎么做", "每个阶段必须有可证伪的成功标准",
@@ -397,9 +432,10 @@ def build():
         put(s, left + Inches(0.18), Inches(1.6), Inches(2.75), Inches(0.45), a, 16, color, True)
         put(s, left + Inches(0.18), Inches(2.15), Inches(2.75), Inches(0.45), b, 18, WHITE, True)
         put(s, left + Inches(0.18), Inches(2.8), Inches(2.75), Inches(3.8), c, 15, SOFT)
-    footer(s, 10, "路线")
+    footer(s, 11, "路线")
+    hide(s)
 
-    # ========== 11 决策 ==========
+    # ========== 12 决策（隐藏） ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "决策", "请拍板的就是封面那三句",
@@ -417,9 +453,10 @@ def build():
         box(s, Inches(0.4), top, Inches(12.5), Inches(0.76), CARD, STROKE)
         put(s, Inches(0.65), top, Inches(1.8), Inches(0.76), k, 18, CYAN, True, valign=MSO_ANCHOR.MIDDLE)
         put(s, Inches(2.6), top, Inches(10.0), Inches(0.76), v, 16, WHITE, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 11, "决策")
+    footer(s, 12, "决策")
+    hide(s)
 
-    # ========== 12 来源 ==========
+    # ========== 13 来源 ==========
     s = prs.slides.add_slide(blank)
     bg(s)
     header(s, "附录", "被问到数字时翻这一页，汇报正文不念",
@@ -429,13 +466,13 @@ def build():
         "Mudra Link 约 249 美元；Apple 表带电极专利 + EMBridge（NeurIPS 2025 workshop），手表未出货",
         "AKM AK5816AIM（2026-07 量产）：无摄像头跌倒 + 呼吸；模块口径写静息 / 睡眠，走动伪迹未收口",
         "BMW Digital Key Plus / 奔驰：UWB 约 4 m 定左右侧防中继；CCC Digital Key 已上车",
-        "ST ST64UWB（2026，厂商口径）：2025 年 UWB 器件 5.27 亿颗",
-        "Babel SenSys 2025：ImageBind 对 IMU 几乎无效；LIMU-BERT 已上移动端；HoloLLM mmWave +30%",
+        "Babel SenSys 2025：ImageBind 对 IMU 几乎无效；LIMU-BERT 手机可实时跑；HoloLLM mmWave +30%",
+        "港科大 Mo Li：LIMU-BERT → UniHAR → Babel；南洋理工 MARS：HoloLLM；Meta FAIR：DIGIT / Sparsh / Neural Band",
         "观察不进本版 TOP4：座舱 CPD、房间人感、肌电义肢（器械渠道）",
     ]
     for i, t in enumerate(srcs):
         put(s, Inches(0.55), Inches(1.38 + i * 0.7), Inches(12.2), Inches(0.65), "·  " + t, 14, SOFT)
-    footer(s, 12, "来源")
+    footer(s, 13, "来源")
 
     out = r"g:\My Drive\Documents\AI物理感知\AI物理感知平台-传感器口径-汇报.pptx"
     try:
@@ -445,6 +482,8 @@ def build():
         prs.save(out)
     print("SAVED", out)
     print("SLIDES", len(prs.slides))
+    hidden = sum(1 for sl in prs.slides if sl._element.get("show") == "0")
+    print("HIDDEN", hidden)
 
 
 if __name__ == "__main__":
