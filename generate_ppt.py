@@ -143,7 +143,7 @@ def build():
         "华为内部立项  ·  痛点驱动：多模态 · 多设备 · 多场景", 14, RED, True)
     put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
     put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
-        "Ingest 契约 → 共享表征 → predict() / classify()，不做场景应用", 18, BODY)
+        "接入规格 → 共享表征 → 预测 / 分类双接口，不做场景应用", 18, BODY)
     box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.2), CARD, STROKE)
     put(s, Inches(0.95), Inches(3.25), Inches(11.4), Inches(0.95),
         "三大痛点：多模态融合不足、多设备自适应困难、多任务多场景泛化弱。\n"
@@ -151,7 +151,7 @@ def build():
         15, BODY)
     for i, (k, v) in enumerate([
         ("痛点", "多模态 · 多设备 · 多场景"),
-        ("接口", "Ingest schema + predict + classify"),
+        ("接口", "接入规格 + 预测 + 分类"),
         ("演进", "零样本基线 → 千人千面 → Token 嵌入大模型"),
     ]):
         left = Inches(0.7 + i * 4.05)
@@ -196,7 +196,7 @@ def build():
         ("Chronos\nAmazon Science\nICML'24", "离散 token\nT5 式 NTP", "单变量概率预测", "✗", "Apache-2.0"),
         ("Moirai\nSalesforce AI Research\nICML'24", "masked encoder\nany-variate", "多变量概率预测", "✗", "代码 Apache\n权重 CC-BY-NC"),
         ("UniTS\nHarvard + MIT Lincoln Lab\nNeurIPS'24", "任务 token\nGEN/CLS 共享参数", "预测+分类+填补+异常一体；\n38 个数据集对比领先", "✓ 原生", "MIT"),
-        ("MOMENT\nCMU Auton Lab\nICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\nlinear probe 即用", "✓ 探针", "MIT"),
+        ("MOMENT\nCMU Auton Lab\nICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\n线性探针即用", "✓ 探针", "MIT"),
     ]
     for i, row in enumerate(rows):
         top = Inches(1.82 + i * 0.9)
@@ -241,11 +241,11 @@ def build():
     # 5 痛点 → 方案
     s = blank_slide(prs)
     header(s, "4  痛点 → 方案", "每个痛点对应一类已验证的模型能力",
-           "平台不做场景：只把模型能力收敛成 Ingest → 表征 → predict / classify。")
+           "平台不做场景：只把模型能力收敛成 接入 → 表征 → 预测 / 分类。")
     rows = [
-        ("多模态\n融合不足", "统一 patch token + 变元注意力：TimesFM-3 变元注意力、UniTS 任务 token；Babel 6 模态对齐作参照。\nIngest 契约统一时钟、量纲、质量位——对齐在进模型前完成。", RED),
+        ("多模态\n融合不足", "统一 patch token + 变元注意力：TimesFM-3 变元注意力、UniTS 任务 token；Babel 6 模态对齐作参照。\n接入规格统一时钟、量纲、质量位——对齐在进模型前完成。", RED),
         ("多设备\n自适应困难", "跨设备预训练先验：LIMU-BERT-X 覆盖 1.1K 机型、6 万人；Meta EMG 跨用户泛化。\nRevIN 实例归一 + LoRA 轻适配（TartanIMU 仅 1.1M 参数即适配新设备）。", ORANGE),
-        ("多任务多场景\n泛化弱", "零样本基座：TimesFM-3 零样本预测；UniTS 零样本多任务（预测/分类/填补/异常）。\n统一 predict / classify 接口，新场景先零样本启动，再按需微调。", CYAN),
+        ("多任务多场景\n泛化弱", "零样本基座：TimesFM-3 零样本预测；UniTS 零样本多任务（预测/分类/填补/异常）。\n统一预测 / 分类接口，新场景先零样本启动，再按需微调。", CYAN),
     ]
     for i, (k, v, c) in enumerate(rows):
         top = Inches(1.5 + i * 1.35)
@@ -255,32 +255,32 @@ def build():
         put(s, Inches(3.8), top + Inches(0.12), Inches(8.8), Inches(1.0), v, 12, BODY)
     box(s, Inches(0.5), Inches(5.65), Inches(12.3), Inches(0.85), CARD, STROKE)
     put(s, Inches(0.7), Inches(5.78), Inches(11.9), Inches(0.62),
-        "平台边界：交付 Ingest 校验、共享表征、predict() / classify()、评测工具链；不交付场景 Pack、整机、芯片。",
+        "平台边界：交付接入校验、共享表征、预测 / 分类双接口、评测工具链；不交付场景 Pack、整机、芯片。",
         13, RED, True)
     footer(s, 5, "痛点→方案")
 
     # 6 接口定义
     s = blank_slide(prs)
-    header(s, "5  接口定义", "Ingest 契约 + predict() + classify()",
-           "所有输入先过 Ingest；预测与分类共用同一批 patch token。")
+    header(s, "5  接口定义", "接入规格 + 预测接口 + 分类接口",
+           "所有输入先过接入校验；预测与分类共用同一批 patch token。")
     box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(2.0), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(0.08), RED)
-    put(s, Inches(0.7), Inches(1.75), Inches(11.9), Inches(0.35), "Ingest(schema) → 校验 → patch token", 16, RED, True)
+    put(s, Inches(0.7), Inches(1.75), Inches(11.9), Inches(0.35), "接入（数据规格） → 校验 → patch token", 16, RED, True)
     put(s, Inches(0.7), Inches(2.2), Inches(11.9), Inches(1.1),
-        "schema = {series_id, timestamp, value, unit, quality_flag, variate_role: target/past-only/past-future}\n"
-        "校验：时钟对齐、量纲归一、质量位过滤、变元上限 32、context ≤ 15,360。不合格直接拒收。",
+        "数据规格 = {序列 id, 时间戳, 数值, 量纲单位, 质量位, 变元角色: 目标 / 仅历史 / 历史+未来}\n"
+        "校验：时钟对齐、量纲归一、质量位过滤、变元上限 32、历史段 ≤ 15,360。不合格直接拒收。",
         13, BODY)
     box(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(2.4), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(0.08), GREEN)
-    put(s, Inches(0.7), Inches(3.95), Inches(5.7), Inches(0.35), "predict(context, horizon) → {quantiles, point}", 16, GREEN, True)
+    put(s, Inches(0.7), Inches(3.95), Inches(5.7), Inches(0.35), "预测（历史段, 预测时长） → {分位数, 点预测}", 16, GREEN, True)
     put(s, Inches(0.7), Inches(4.45), Inches(5.7), Inches(1.4),
-        "quantiles: (V, H, 9) 十分位轨迹\npoint: (V, H) 中位数 q50\n一次前向，CPM 非自回归；可 stitching 任意 H。",
+        "分位数：(V, H, 9) 十分位轨迹\n点预测：(V, H) 中位数 q50\n一次前向，CPM 非自回归；可拼接任意预测长度。",
         13, BODY)
     box(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(2.4), WHITE, STROKE)
     rect(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(0.08), CYAN)
-    put(s, Inches(7.0), Inches(3.95), Inches(5.6), Inches(0.35), "classify(window) → {label, confidence}", 16, CYAN, True)
+    put(s, Inches(7.0), Inches(3.95), Inches(5.6), Inches(0.35), "分类（时间窗） → {类别, 置信度}", 16, CYAN, True)
     put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
-        "label: 场景方注册的类别 id\nconfidence: softmax 概率\n基于共享表征 + 任务 token / linear probe。",
+        "类别：场景方注册的类别 id\n置信度：softmax 概率\n基于共享表征 + 任务 token / 线性探针。",
         13, BODY)
     footer(s, 6, "接口")
 
@@ -289,12 +289,12 @@ def build():
     header(s, "6  预测实现", "TimesFM-3 式：CPM 一次前向出 9 分位数",
            "预测是平台原生能力；接口固定，底座可换。")
     preds = [
-        ("输入", "context ≤ 15,360；变元 ≤ 32；target / past-only / past-future。"),
+        ("输入", "历史段 ≤ 15,360；变元 ≤ 32；目标 / 仅历史 / 历史+未来 三类变元。"),
         ("特征", "pad32 → 去趋势 → RevIN → patch 192 → ResidualBlock → 1280 token。"),
         ("表征", "20 × MixingTransformer：因果时间注意力 + 变元注意力 + FFN。"),
-        ("输出头", "Linear 1280→64×9；CPM mask horizon；逆 RevIN；stitching 任意 H。"),
+        ("输出头", "Linear 1280→64×9；CPM 掩码预测段；逆 RevIN；拼接任意预测长度。"),
         ("读出", "点预测 q50；概率区间 q10–q90；MAE + 覆盖率评测。"),
-        ("替换点", "底座换 TimesFM-4 / 自研时，predict() 签名与返回结构不变。"),
+        ("替换点", "底座换 TimesFM-4 / 自研时，预测接口签名与返回结构不变。"),
     ]
     for i, (t, d) in enumerate(preds):
         r, c = divmod(i, 2)
@@ -307,7 +307,7 @@ def build():
 
     # 8 分类实现
     s = blank_slide(prs)
-    header(s, "7  分类实现", "共享表征 + 任务 token / linear probe",
+    header(s, "7  分类实现", "共享表征 + 任务 token / 线性探针",
            "分类不是 TimesFM 内建；平台用 UniTS / MOMENT 方式补。")
     box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
@@ -322,9 +322,9 @@ def build():
     put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "路 B  可学习分类（平台接口）", 17, RED, True)
     put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
         "UniTS：任务 token 把预测 / 分类 / 填补 / 异常收进同一套参数。\n"
-        "MOMENT：掩码预训练编码器 + linear probe / 分类头。\n"
+        "MOMENT：掩码预训练编码器 + 线性探针 / 分类头。\n"
         "LIMU-BERT-X：IMU 掩码预训练，直接初始化 IMU 变元。\n\n"
-        "场景方注册类别 → 平台微调 classify() → 返回 label + confidence。",
+        "场景方注册类别 → 平台微调分类接口 → 返回类别 + 置信度。",
         14, BODY)
     footer(s, 8, "分类")
 
@@ -334,9 +334,9 @@ def build():
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
-         "预训练底座直接上岗。\npredict 零样本（TimesFM-3）；\nclassify 规则 / linear probe（UniTS / MOMENT）。\n回答：底座行不行 → 统一评测基线。", RED),
+         "预训练底座直接上岗。\n预测零样本（TimesFM-3）；\n分类走规则 / 线性探针（UniTS / MOMENT）。\n回答：底座行不行 → 统一评测基线。", RED),
         ("Gen2  千人千面",
-         "轻量适配到每设备、每用户。\nLoRA / prompt tuning：TartanIMU 仅 1.1M 参数；\nMeta EMG 个性化后再 +16%。\n回答：换设备换人还行不行 → 画像进 schema。", ORANGE),
+         "轻量适配到每设备、每用户。\nLoRA / 提示微调：TartanIMU 仅 1.1M 参数；\nMeta EMG 个性化后再 +16%。\n回答：换设备换人还行不行 → 画像进数据规格。", ORANGE),
         ("Gen3  Token 嵌入大模型",
          "物理 patch token 作为新模态注入大模型。\n预测 + 分类变成大模型的原生能力；\n平台从「提供模型」变成「提供 token 与接口」。\n回答：物理感知如何进入统一智能。", CYAN),
     ]
@@ -348,7 +348,7 @@ def build():
         put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.9), d, 12, BODY)
     box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "演进原则：接口（Ingest / predict / classify）向下兼容；底座、权重、头可独立替换。",
+        "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
     footer(s, 9, "代际演进")
 
@@ -360,8 +360,8 @@ def build():
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), GREEN)
     put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "评测接口", 17, GREEN, True)
     put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
-        "predict：MAE、q10–q90 覆盖率、stitching 长 horizon 稳定性。\n"
-        "classify：macro-F1、confusion matrix、注册类别一致性。\n"
+        "预测：MAE、q10–q90 覆盖率、长时域拼接稳定性。\n"
+        "分类：宏 F1、混淆矩阵、注册类别一致性。\n"
         "底座对比：同一批数据，同一接口，换底座重跑。",
         14, BODY)
     box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
@@ -382,9 +382,9 @@ def build():
            "痛点驱动：统一表征 + 统一接口；底座可换，代际演进向下兼容。")
     lines = [
         ("痛点", "多模态融合不足、多设备自适应困难、多任务泛化弱 → 统一表征 + 统一接口。"),
-        ("接口", "Ingest schema + predict() + classify()；版本化，向下兼容。"),
+        ("接口", "接入规格 + 预测接口 + 分类接口；版本化，向下兼容。"),
         ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 覆盖率。"),
-        ("分类", "UniTS 任务 token / MOMENT linear probe；场景方注册类别，平台微调。"),
+        ("分类", "UniTS 任务 token / MOMENT 线性探针；场景方注册类别，平台微调。"),
         ("演进", "零样本基线 → 千人千面 → Token 嵌入大模型；接口不变。"),
         ("许可", "3.0 权重 NC；≤2.5 Apache；UniTS / MOMENT MIT；平台层与许可层解耦。"),
         ("不做", "场景 Pack、整机、芯片、自建大模型、世界视频、把 TimesFM 当分类模型宣传。"),
