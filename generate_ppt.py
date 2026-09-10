@@ -189,21 +189,21 @@ def build():
     header(s, "2  模型盘点 · 通用时序", "通用时序基础模型：预测强，分类只有两家原生支持",
            "口径：预训练目标决定原生能力；TimesFM / Chronos / Moirai 都只做预测。")
     cols = [(0.5, 2.5), (3.05, 2.5), (5.6, 3.6), (9.25, 1.4), (10.7, 2.1)]
-    for (cx, cw), htxt in zip(cols, ["模型 / 出处", "预训练目标", "原生能力", "分类", "许可"]):
+    for (cx, cw), htxt in zip(cols, ["模型 / 作者单位", "预训练目标", "原生能力", "分类", "许可"]):
         put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
     rows = [
-        ("TimesFM-3\nGoogle 2026", "decoder-only\n分位数回归", "多变量预测 + 协变量；\nCPM 一次前向出 9 分位", "✗ 规则/加头", "3.0 权重 NC\n≤2.5 Apache"),
-        ("Chronos\nAmazon 2024", "离散 token\nT5 式 NTP", "单变量概率预测", "✗", "Apache-2.0"),
-        ("Moirai\nSalesforce 2024", "masked encoder\nany-variate", "多变量概率预测", "✗", "代码 Apache\n权重 CC-BY-NC"),
-        ("UniTS\nHarvard NeurIPS'24", "任务 token\nGEN/CLS 共享参数", "预测+分类+填补+异常一体；\n38 个数据集对比领先", "✓ 原生", "MIT"),
-        ("MOMENT\nCMU ICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\nlinear probe 即用", "✓ 探针", "MIT"),
+        ("TimesFM-3\nGoogle Research\nICML'24 / 3.0 2026", "decoder-only\n分位数回归", "多变量预测 + 协变量；\nCPM 一次前向出 9 分位", "✗ 规则/加头", "3.0 权重 NC\n≤2.5 Apache"),
+        ("Chronos\nAmazon Science\nICML'24", "离散 token\nT5 式 NTP", "单变量概率预测", "✗", "Apache-2.0"),
+        ("Moirai\nSalesforce AI Research\nICML'24", "masked encoder\nany-variate", "多变量概率预测", "✗", "代码 Apache\n权重 CC-BY-NC"),
+        ("UniTS\nHarvard + MIT Lincoln Lab\nNeurIPS'24", "任务 token\nGEN/CLS 共享参数", "预测+分类+填补+异常一体；\n38 个数据集对比领先", "✓ 原生", "MIT"),
+        ("MOMENT\nCMU Auton Lab\nICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\nlinear probe 即用", "✓ 探针", "MIT"),
     ]
     for i, row in enumerate(rows):
         top = Inches(1.82 + i * 0.9)
         box(s, Inches(0.5), top, Inches(12.3), Inches(0.82), WHITE if i % 2 == 0 else CARD, STROKE)
         for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
             if j == 0:
-                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 12, RED, True)
+                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.76), cell, 11, RED, True)
             elif j == 3:
                 put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 12,
                     GREEN if cell.startswith("✓") else MUTED, True)
@@ -217,22 +217,22 @@ def build():
     header(s, "3  模型盘点 · 物理传感器", "IMU / EMG 专用模型：提供领域先验，不当平台底座",
            "传感器模型规模小、端侧导向；与通用底座互补，不替代。")
     cols = [(0.5, 2.6), (3.15, 3.3), (6.5, 4.4), (10.95, 1.85)]
-    for (cx, cw), htxt in zip(cols, ["模型 / 出处", "数据 / 预训练", "能力亮点", "部署 / 许可"]):
+    for (cx, cw), htxt in zip(cols, ["模型 / 作者单位", "数据 / 预训练", "能力亮点", "部署 / 许可"]):
         put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
     rows = [
-        ("LIMU-BERT\nSenSys'21", "IMU 三轴\n掩码预训练", "端侧 HAR 开山作；小样本迁移到手机 / 腕戴", "手机可部署"),
-        ("LIMU-BERT-X\nMobiCom'25", "143 万小时 · 6 万人\n1.1K 种机型", "真实设备大规模泛化；端侧 HAR SOTA", "端侧"),
-        ("TartanIMU\nCVPR'25", "跨机器人 IMU\n位姿基础模型", "LoRA 仅 1.1M 参数即适配新机；200 FPS 在线推理", "机器人"),
-        ("PRIMUS\nICASSP'25", "IMU 多模态\n自监督对齐", "对齐预训练，提升下游 HAR / 健康任务", "研究"),
-        ("Babel\nSenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知表征", "研究"),
-        ("Meta EMG\nNature'25", "sEMG 腕带\n跨用户泛化", "0.88 手势/s；手写 20.9 WPM；个性化再 +16%", "腕带\nCC-BY-NC"),
+        ("LIMU-BERT\n南洋理工+阿里巴巴\nSenSys'21", "IMU 三轴\n掩码预训练", "端侧 HAR 开山作；小样本迁移到手机 / 腕戴", "手机可部署"),
+        ("LIMU-BERT-X\n港科大+阿里巴巴\nMobiCom'25", "143 万小时 · 6 万人\n1.1K 种机型", "真实设备大规模泛化；端侧 HAR SOTA；外卖配送全国部署", "端侧"),
+        ("TartanIMU\nCMU AirLab\nCVPR'25", "跨机器人 IMU\n位姿基础模型", "LoRA 仅 1.1M 参数即适配新机；200 FPS 在线推理", "机器人"),
+        ("PRIMUS\nNokia Bell Labs\n+华盛顿大学 ICASSP'25", "IMU 多模态\n自监督对齐", "对齐预训练，提升下游 HAR / 健康任务", "研究"),
+        ("Babel\n微软研究院+威斯康星\n麦迪逊+港科大 SenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知表征", "研究"),
+        ("Meta EMG\nMeta\nNature'25", "sEMG 腕带\n跨用户泛化", "0.88 手势/s；手写 20.9 WPM；个性化再 +16%", "腕带\nCC-BY-NC"),
     ]
     for i, row in enumerate(rows):
         top = Inches(1.8 + i * 0.75)
         box(s, Inches(0.5), top, Inches(12.3), Inches(0.68), WHITE if i % 2 == 0 else CARD, STROKE)
         for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
             if j == 0:
-                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.6), cell, 12, RED, True)
+                put(s, Inches(cx + 0.12), top + Inches(0.03), Inches(cw - 0.2), Inches(0.64), cell, 10, RED, True)
             else:
                 put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.6), cell, 11, BODY)
     so_what(s, "平台用 LIMU-BERT-X 初始化 IMU 变元、用 Meta EMG 作 EMG 对照；底座仍是通用模型。")
