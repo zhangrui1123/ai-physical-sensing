@@ -140,40 +140,40 @@ def build():
     s = blank_slide(prs)
     rect(s, 0, 0, Inches(0.12), prs.slide_height, RED)
     put(s, Inches(0.7), Inches(1.25), Inches(12), Inches(0.32),
-        "华为内部立项  ·  融合 TimesFM-3 + UniTS/MOMENT + LIMU-BERT-X", 14, RED, True)
+        "华为内部立项  ·  平台工具化：接口明确 + 代际演进", 14, RED, True)
     put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
     put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
-        "一个物理时序底座，同时出预测与分类", 18, BODY)
+        "Ingest 契约 → 共享表征 → predict() / classify()，不做场景应用", 18, BODY)
     box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.2), CARD, STROKE)
     put(s, Inches(0.95), Inches(3.25), Inches(11.4), Inches(0.95),
-        "TimesFM-3 管零样本预测；UniTS / MOMENT 管多任务与分类；LIMU-BERT-X 管 IMU 表征。\n"
-        "融合成 PhysFM：PhysIngest → 共享表征 → 预测头 + 分类头。不做场景应用、不做整机。",
+        "平台只交付工具链：统一输入契约、两个推理函数、可替换底座。\n"
+        "TimesFM-3 管预测，UniTS/MOMENT 管分类，LIMU-BERT-X 管 IMU 先验；底座可换，接口不变。",
         15, BODY)
     for i, (k, v) in enumerate([
-        ("预测", "TimesFM-3 式 CPM · 9 分位数"),
-        ("分类", "UniTS 任务 token / MOMENT 头"),
-        ("IMU 先验", "LIMU-BERT-X · 143 万小时"),
+        ("接口", "Ingest schema + predict + classify"),
+        ("底座", "TimesFM-3 + UniTS/MOMENT + LIMU-BERT-X"),
+        ("演进", "Gen1 零样本 → Gen2 指令微调"),
     ]):
         left = Inches(0.7 + i * 4.05)
         box(s, left, Inches(4.55), Inches(3.85), Inches(1.7), WHITE, STROKE)
         rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  8 页架构版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  8 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
-    # 2 规格
+    # 2 平台边界
     s = blank_slide(prs)
-    header(s, "1  规格", "融合底座：TimesFM 主干 + 双头 + IMU 预训练",
-           "目标：同一批 patch token，同时给出分位数预测与类别 logits。")
+    header(s, "1  平台边界", "只做工具，不做场景；接口稳定，底座可换",
+           "明确划分：平台负责 Ingest → 表征 → 推理；场景方负责业务标签与闭环。")
     rows = [
-        ("主干", "TimesFM-3：20 层 Mixing Transformer，d=1280，16 heads"),
-        ("patch", "输入 32 / 输出 64；上下文上限 15,360；变元上限 32"),
-        ("预测头", "Linear 1280→64×9，CPM 一次解码，median=q50"),
-        ("分类头", "UniTS 任务 token 或 MOMENT linear-probe；可 LoRA 微调"),
-        ("IMU 初始化", "LIMU-BERT-X：143 万小时、6 万人、1.1K 机型，端侧可用"),
-        ("许可", "TimesFM-3 权重 NC；UniTS / MOMENT / LIMU-BERT 公开可研究。商用自训。"),
+        ("平台交付", "PhysIngest 校验、共享表征、predict() / classify()、评测工具链"),
+        ("平台不交付", "场景 Pack、整机 App、芯片、盘古、世界视频、把 TimesFM 当分类模型宣传"),
+        ("底座可替换", "TimesFM-3 → 自研 / 更新版本；UniTS/MOMENT → 其他多任务模型"),
+        ("接口不替换", "Ingest schema、predict() 返回结构、classify() 返回结构保持兼容"),
+        ("输入", "target / past-only / past-future 变元；IMU / EMG / TP 只是变元"),
+        ("输出", "预测：quantiles + point；分类：label + confidence；无场景语义"),
     ]
     for i, (k, v) in enumerate(rows):
         r, c = divmod(i, 2)
@@ -182,83 +182,45 @@ def build():
         box(s, left, top, Inches(6.15), Inches(1.35), WHITE, STROKE)
         put(s, left + Inches(0.22), top + Inches(0.18), Inches(5.7), Inches(0.35), k, 15, RED, True)
         put(s, left + Inches(0.22), top + Inches(0.58), Inches(5.7), Inches(0.6), v, 14, BODY)
-    so_what(s, "TimesFM 原生没有分类头；要「预测+分类」必须融合 UniTS 式任务 token 或 MOMENT 式探针。")
-    footer(s, 2, "规格")
+    so_what(s, "平台不抢场景：场景方调 predict/classify，平台方保接口与底座演进。")
+    footer(s, 2, "平台边界")
 
-    # 3 输入与流水线
+    # 3 接口定义
     s = blank_slide(prs)
-    header(s, "2  总览", "四段流水：输入 → 特征 → 表征 → 双头",
-           "物理传感器只作为变元接入：target / past-only / past-future。")
-    steps = [
-        ("输入", "target (B,U,C)\npast-only (B,Vpo,C)\npast-future (B,W,C+H)", RED),
-        ("特征提取", "pad32 · 去趋势 · 堆叠 V\n切 patch · RevIN · ResidualBlock", ORANGE),
-        ("共享表征", "20 × MixingTransformer\n因果时间注意力 + 变元注意力", CYAN),
-        ("双头", "预测：Linear 1280→64×9\n分类：任务 token / linear probe", GREEN),
-    ]
-    for i, (t, d, c) in enumerate(steps):
-        left = Inches(0.45 + i * 3.2)
-        box(s, left, Inches(1.55), Inches(3.05), Inches(3.15), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
-        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), f"{i+1}. {t}", 16, c, True)
-        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.1), d, 13, BODY)
-    box(s, Inches(0.5), Inches(4.9), Inches(12.3), Inches(1.3), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.05), Inches(11.9), Inches(0.3), "物理变元怎么接（不是应用场景）", 14, RED, True)
-    put(s, Inches(0.7), Inches(5.4), Inches(11.9), Inches(0.7),
-        "IMU / EMG 作 target 或 past-only；已知未来通道作 past-future，horizon 上保持可见。\n"
-        "变元上限 32。无 schema / 时钟 / 质量位则拒收——这是 Ingest，TimesFM 不管。",
+    header(s, "2  接口定义", "Ingest 契约 + predict() + classify()",
+           "所有输入先过 Ingest；预测与分类共用同一批 patch token。")
+    box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(2.0), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(0.08), RED)
+    put(s, Inches(0.7), Inches(1.75), Inches(11.9), Inches(0.35), "Ingest(schema) → 校验 → patch token", 16, RED, True)
+    put(s, Inches(0.7), Inches(2.2), Inches(11.9), Inches(1.1),
+        "schema = {series_id, timestamp, value, unit, quality_flag, variate_role: target/past-only/past-future}\n"
+        "校验：时钟对齐、量纲归一、质量位过滤、变元上限 32、context ≤ 15,360。不合格直接拒收。",
         13, BODY)
-    footer(s, 3, "总览")
+    box(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(2.4), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(0.08), GREEN)
+    put(s, Inches(0.7), Inches(3.95), Inches(5.7), Inches(0.35), "predict(context, horizon) → {quantiles, point}", 16, GREEN, True)
+    put(s, Inches(0.7), Inches(4.45), Inches(5.7), Inches(1.4),
+        "quantiles: (V, H, 9) 十分位轨迹\npoint: (V, H) 中位数 q50\n一次前向，CPM 非自回归；可 stitching 任意 H。",
+        13, BODY)
+    box(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(2.4), WHITE, STROKE)
+    rect(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(0.08), CYAN)
+    put(s, Inches(7.0), Inches(3.95), Inches(5.6), Inches(0.35), "classify(window) → {label, confidence}", 16, CYAN, True)
+    put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
+        "label: 场景方注册的类别 id\nconfidence: softmax 概率\n基于共享表征 + 任务 token / linear probe。",
+        13, BODY)
+    footer(s, 3, "接口")
 
-    # 4 特征提取
+    # 4 预测实现
     s = blank_slide(prs)
-    header(s, "3  特征提取", "数据是 patch token，不是逐步 RNN 状态",
-           "每个时间 patch 拼成 192 维，ResidualBlock → 1280 维 token。")
-    feats = [
-        ("1 对齐", "context 左 pad 到 32 倍数。horizon 上目标全 mask；past-future 在 horizon 可见。"),
-        ("2 变元堆叠", "target ⊕ past-only ⊕ past-future 沿 V 维拼接，供变元注意力交互。"),
-        ("3 去趋势", "可选线性去趋势；去趋势后 std 明显更小（阈值 0.5）才减直线，预测后再加回。"),
-        ("4 RevIN", "逐变元 running mean/std。horizon 用 CPM：mask 目标 patch，用上下文统计并可迭代修正。"),
-        ("5 Patch 嵌入", "当前 32 + roll 未来 64 + mask 96 → concat 192 → ResidualBlock（两层线性+ReLU+残差）→ d=1280。"),
-    ]
-    for i, (t, d) in enumerate(feats):
-        top = Inches(1.48 + i * 0.9)
-        box(s, Inches(0.5), top, Inches(12.3), Inches(0.82), WHITE if i % 2 == 0 else CARD, STROKE)
-        put(s, Inches(0.7), top, Inches(2.4), Inches(0.82), t, 16, RED, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(3.2), top, Inches(9.4), Inches(0.82), d, 14, BODY, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 4, "特征提取")
-
-    # 5 Mixing Transformer
-    s = blank_slide(prs)
-    header(s, "4  表征", "Mixing Transformer 学的是条件表征，预测与分类共用",
-           "每层对 (B, V, N, 1280) 做：时间注意力 → 变元注意力 → FFN。堆叠 20 层。")
-    cards = [
-        (CYAN, "时间注意力",
-         "因果 + RoPE。\n每个变元独立：第 t 个 patch 只能看 ≤ t。\n建模趋势、季节、水平漂移。"),
-        (ORANGE, "变元注意力",
-         "同一时刻、跨通道、非因果。\n目标与协变量在同一 patch 交换信息。\n这是 3.0 相对 2.x 单变量的核心。"),
-        (GREEN, "FFN",
-         "RMSNorm + ReLU MLP + 残差。\n输出条件表征，同时供预测头与分类头。\nUniTS / MOMENT 证明这套表征可做分类。"),
-    ]
-    for i, (c, t, d) in enumerate(cards):
-        left = Inches(0.5 + i * 4.2)
-        box(s, left, Inches(1.55), Inches(4.0), Inches(3.55), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(0.1), Inches(3.55), c)
-        put(s, left + Inches(0.25), Inches(1.75), Inches(3.5), Inches(0.45), t, 18, c, True)
-        put(s, left + Inches(0.25), Inches(2.4), Inches(3.5), Inches(2.4), d, 15, BODY)
-    so_what(s, "表征层不动 TimesFM；分类能力来自在表征上接 UniTS 任务 token 或 MOMENT 探针。")
-    footer(s, 5, "表征")
-
-    # 6 预测
-    s = blank_slide(prs)
-    header(s, "5  预测", "decode() 非自回归：整段 context+horizon 只走一遍",
-           "TimesFM3Torch.decode() → forward() → TimesFM3Forecaster.predict_batch()。")
+    header(s, "3  预测实现", "TimesFM-3 式：CPM 一次前向出 9 分位数",
+           "预测是平台原生能力；接口固定，底座可换。")
     preds = [
-        ("输出头", "Linear(1280 → 64×9)。每个输入 patch 预测未来 64 步、9 个分位数。"),
-        ("CPM", "horizon 目标 patch 先 mask。用上下文统计量做 RevIN，并可迭代用模型估计修正。"),
-        ("逆变换", "分位数在 RevIN 空间；逆归一化后再加回去趋势。"),
-        ("Stitching", "相邻窗口重叠 32 点，拼出任意 horizon（可超过 64）。"),
-        ("读出", "点预测：quantiles[..., 4]（0.5）。概率：9 条分位轨迹，做区间与校准。"),
-        ("Eval", "点预测 MAE；q10–q90 覆盖率。对照 TimesFM-3 单变量 / 多变量两种模式。"),
+        ("输入", "context ≤ 15,360；变元 ≤ 32；target / past-only / past-future。"),
+        ("特征", "pad32 → 去趋势 → RevIN → patch 192 → ResidualBlock → 1280 token。"),
+        ("表征", "20 × MixingTransformer：因果时间注意力 + 变元注意力 + FFN。"),
+        ("输出头", "Linear 1280→64×9；CPM mask horizon；逆 RevIN；stitching 任意 H。"),
+        ("读出", "点预测 q50；概率区间 q10–q90；MAE + 覆盖率评测。"),
+        ("替换点", "底座换 TimesFM-4 / 自研时，predict() 签名与返回结构不变。"),
     ]
     for i, (t, d) in enumerate(preds):
         r, c = divmod(i, 2)
@@ -267,41 +229,85 @@ def build():
         box(s, left, top, Inches(6.15), Inches(1.42), WHITE, STROKE)
         put(s, left + Inches(0.22), top + Inches(0.15), Inches(5.7), Inches(0.35), t, 16, RED, True)
         put(s, left + Inches(0.22), top + Inches(0.55), Inches(5.7), Inches(0.75), d, 13, BODY)
-    footer(s, 6, "预测")
+    footer(s, 4, "预测")
 
-    # 7 分类
+    # 5 分类实现
     s = blank_slide(prs)
-    header(s, "6  分类", "分类不是 TimesFM 内建；融合 UniTS / MOMENT / LIMU-BERT-X",
-           "规则只做异常示意；可学习分类必须接在共享表征上。")
+    header(s, "4  分类实现", "共享表征 + 任务 token / linear probe",
+           "分类不是 TimesFM 内建；平台用 UniTS / MOMENT 方式补。")
     box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
-    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "路 A  规则下游（零样本）", 17, MUTED, True)
+    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "路 A  规则下游（零样本，示意）", 17, MUTED, True)
     put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
         "历史段：去趋势残差 z-score。\n|z|≥3 CRITICAL，≥2 WARNING，否则 NORMAL。\n\n"
-        "未来段：观测是否落在 q10–q90 / q20–q80 外。\n区间外 → 异常。\n\n"
-        "不改权重，不能当「可学习分类」。",
+        "未来段：观测是否落在 q10–q90 / q20–q80 外。\n\n"
+        "不改权重，不能注册新类别，只能做异常示意。",
         14, BODY)
     box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), RED)
-    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "路 B  共享表征 + 分类头", 17, RED, True)
+    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "路 B  可学习分类（平台接口）", 17, RED, True)
     put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
         "UniTS：任务 token 把预测 / 分类 / 填补 / 异常收进同一套参数。\n"
         "MOMENT：掩码预训练编码器 + linear probe / 分类头。\n"
         "LIMU-BERT-X：IMU 掩码预训练，直接初始化 IMU 变元。\n\n"
-        "物理信号分类走这条；LoRA 微调参照 timesfm-forecasting/examples/finetuning/。",
+        "场景方注册类别 → 平台微调 classify() → 返回 label + confidence。",
         14, BODY)
-    footer(s, 7, "分类")
+    footer(s, 5, "分类")
+
+    # 6 代际演进
+    s = blank_slide(prs)
+    header(s, "5  代际演进", "Gen1 零样本 → Gen2 指令微调 → Gen3 端侧",
+           "接口不变，底座与能力逐代升级。")
+    gens = [
+        ("Gen1  零样本基线", "TimesFM-3 + UniTS/MOMENT + LIMU-BERT-X\npredict 零样本；classify 规则 / LoRA\n评测：MAE + 覆盖率 + macro-F1", RED),
+        ("Gen2  指令微调", "物理指令数据集：预测 / 分类 / 异常统一 prompt\n底座自研，摆脱 3.0 NC 权重\n评测：zero-shot → few-shot → full-shot", ORANGE),
+        ("Gen3  端侧物理", "LIMU-BERT-X 式端侧初始化 + 量化\npredict/classify 在设备闭环\n评测：延迟 + 功耗 + 精度", CYAN),
+    ]
+    for i, (t, d, c) in enumerate(gens):
+        left = Inches(0.45 + i * 3.2)
+        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
+        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), t, 16, c, True)
+        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.9), d, 13, BODY)
+    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
+        "演进原则：接口（Ingest / predict / classify）向下兼容；底座、权重、头可独立替换。",
+        14, RED, True)
+    footer(s, 6, "代际演进")
+
+    # 7 评测与许可
+    s = blank_slide(prs)
+    header(s, "6  评测与许可", "同一接口，同一评测，不同底座可对比",
+           "平台提供统一评测工具链；许可边界随底座变化。")
+    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), GREEN)
+    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "评测接口", 17, GREEN, True)
+    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
+        "predict：MAE、q10–q90 覆盖率、stitching 长 horizon 稳定性。\n"
+        "classify：macro-F1、confusion matrix、注册类别一致性。\n"
+        "底座对比：同一批数据，同一接口，换底座重跑。",
+        14, BODY)
+    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), ORANGE)
+    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "许可边界", 17, ORANGE, True)
+    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
+        "TimesFM-3 权重：NC，商用必须自训底座。\n"
+        "TimesFM ≤ 2.5：Apache-2.0，可商用。\n"
+        "UniTS / MOMENT / LIMU-BERT-X：公开可研究，商用前确认 license。\n\n"
+        "平台不绑定任何 NC 权重；接口层与许可层解耦。",
+        14, BODY)
+    footer(s, 7, "评测与许可")
 
     # 8 决策
     s = blank_slide(prs)
-    header(s, "决策", "平台交付「预测+分类」融合底座，不交付应用 Pack",
-           "TimesFM 管预测，UniTS / MOMENT 管分类，LIMU-BERT-X 管 IMU。")
+    header(s, "决策", "平台交付接口与工具链，不交付场景语义",
+           "接口固定，底座可换，代际演进向下兼容。")
     lines = [
-        ("主干", "PhysIngest → pad/RevIN/patch token → 20 层 Mixing Transformer → 双头。"),
-        ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 分位覆盖率。"),
-        ("分类", "UniTS 任务 token / MOMENT linear probe；可 LoRA。对照 LIMU-BERT-X。"),
-        ("IMU", "用 LIMU-BERT-X 初始化 IMU 变元；TartanIMU 作运动估计参照。"),
-        ("许可", "TimesFM-3 权重 NC；UniTS / MOMENT / LIMU-BERT 公开。商用自训。"),
+        ("接口", "Ingest schema + predict() + classify()；版本化，向下兼容。"),
+        ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 覆盖率。"),
+        ("分类", "UniTS 任务 token / MOMENT linear probe；场景方注册类别，平台微调。"),
+        ("演进", "Gen1 零样本 → Gen2 指令微调 → Gen3 端侧；接口不变。"),
+        ("许可", "3.0 权重 NC；2.5 及以前 Apache-2.0；平台层与许可层解耦。"),
         ("不做", "场景 Pack、整机、芯片、盘古、世界视频、把 TimesFM 当分类模型宣传。"),
     ]
     for i, (k, v) in enumerate(lines):
