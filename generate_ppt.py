@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""AI 物理感知平台 PPT：一页一事，标题即结论。"""
+"""AI 物理感知平台 PPT：基于华为浅色 16:9 模板母版。"""
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
@@ -8,20 +8,23 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.oxml.ns import qn
 from lxml import etree
 
-W, H = Inches(13.333), Inches(7.5)
-BG = RGBColor(0x0B, 0x12, 0x20)
-CARD = RGBColor(0x13, 0x1C, 0x2E)
-CARD2 = RGBColor(0x18, 0x24, 0x3A)
-STROKE = RGBColor(0x2A, 0x3A, 0x55)
-CYAN = RGBColor(0x38, 0xBD, 0xF8)
-INDIGO = RGBColor(0x81, 0x8C, 0xF8)
-AMBER = RGBColor(0xFB, 0xBF, 0x24)
-GREEN = RGBColor(0x34, 0xD3, 0x99)
-WHITE = RGBColor(0xF8, 0xFA, 0xFC)
-MUTED = RGBColor(0x94, 0xA3, 0xB8)
-SOFT = RGBColor(0xCB, 0xD5, 0xE1)
+TEMPLATE = r"g:\My Drive\Documents\AI物理感知\PPT模板-浅色版16-9.pptx"
+OUT = r"g:\My Drive\Documents\AI物理感知\AI物理感知平台-华为汇报.pptx"
+
+BG = RGBColor(0xFF, 0xFF, 0xFF)
+CARD = RGBColor(0xF7, 0xF7, 0xF7)
+STROKE = RGBColor(0xDD, 0xDD, 0xDD)
+RED = RGBColor(0xC7, 0x00, 0x0B)
+NAVY = RGBColor(0x1A, 0x1A, 0x1A)
+BODY = RGBColor(0x55, 0x57, 0x57)
+MUTED = RGBColor(0x89, 0x89, 0x89)
+CYAN = RGBColor(0x30, 0xB5, 0xC5)
+GREEN = RGBColor(0x62, 0xB2, 0x30)
+ORANGE = RGBColor(0xED, 0x6D, 0x00)
+INDIGO = RGBColor(0x00, 0x74, 0xCC)
+WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 13
+TOTAL = 8
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -45,9 +48,9 @@ def box(slide, l, t, w, h, fill, line=None):
         sh.line.fill.background()
     else:
         sh.line.color.rgb = line
-        sh.line.width = Pt(1)
+        sh.line.width = Pt(0.75)
     try:
-        sh.adjustments[0] = 0.08
+        sh.adjustments[0] = 0.05
     except Exception:
         pass
     return sh
@@ -73,8 +76,7 @@ def put(slide, l, t, w, h, text, size, color, bold=False, align=PP_ALIGN.LEFT, v
         )
     except Exception:
         pass
-    lines = str(text).split("\n")
-    for i, line in enumerate(lines):
+    for i, line in enumerate(str(text).split("\n")):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.alignment = align
         p.space_after = Pt(2)
@@ -84,407 +86,242 @@ def put(slide, l, t, w, h, text, size, color, bold=False, align=PP_ALIGN.LEFT, v
     return tf
 
 
-def bg(slide):
-    rect(slide, 0, 0, W, H, BG)
+def delete_all_slides(prs):
+    sldIdLst = prs.slides._sldIdLst
+    for sldId in list(sldIdLst):
+        rId = sldId.get(qn("r:id"))
+        prs.part.drop_rel(rId)
+        sldIdLst.remove(sldId)
 
 
-def hide(slide):
-    """PowerPoint show=0：幻灯片放映时隐藏。"""
-    slide._element.set("show", "0")
+def blank_slide(prs):
+    layout = min(prs.slide_layouts, key=lambda L: len(L.placeholders))
+    s = prs.slides.add_slide(layout)
+    for sh in list(s.placeholders):
+        sp = sh._element
+        sp.getparent().remove(sp)
+    rect(s, 0, 0, prs.slide_width, prs.slide_height, BG)
+    return s
 
 
 def footer(slide, page, section=""):
-    rect(slide, 0, Inches(7.28), W, Inches(0.22), RGBColor(0x08, 0x0D, 0x16))
+    rect(slide, 0, Inches(7.15), Inches(13.333), Inches(0.35), RGBColor(0xF2, 0xF2, 0xF2))
     put(
-        slide, Inches(0.4), Inches(7.28), Inches(9.2), Inches(0.22),
-        ("AI 物理感知  ·  " + section) if section else "AI 物理感知平台",
+        slide, Inches(0.5), Inches(7.15), Inches(9.0), Inches(0.35),
+        f"华为  ·  AI 物理感知平台  ·  {section}    |    Security Level: Internal",
         9, MUTED, valign=MSO_ANCHOR.MIDDLE,
     )
     put(
-        slide, Inches(11.3), Inches(7.28), Inches(1.6), Inches(0.22),
+        slide, Inches(11.2), Inches(7.15), Inches(1.7), Inches(0.35),
         f"{page}  /  {TOTAL}", 9, MUTED, align=PP_ALIGN.RIGHT, valign=MSO_ANCHOR.MIDDLE,
     )
 
 
 def header(slide, kicker, title, subtitle=None):
-    rect(slide, 0, 0, Inches(0.12), H, CYAN)
-    put(slide, Inches(0.45), Inches(0.14), Inches(12.4), Inches(0.26), kicker, 11, CYAN, True)
-    put(slide, Inches(0.45), Inches(0.38), Inches(12.5), Inches(0.52), title, 22, WHITE, True)
+    put(slide, Inches(0.5), Inches(0.22), Inches(12.2), Inches(0.28), kicker, 11, RED, True)
+    put(slide, Inches(0.5), Inches(0.48), Inches(12.2), Inches(0.48), title, 24, NAVY, True)
+    rect(slide, Inches(0.5), Inches(1.0), Inches(1.2), Inches(0.05), RED)
     if subtitle:
-        put(slide, Inches(0.45), Inches(0.88), Inches(12.5), Inches(0.34), subtitle, 13, MUTED)
+        put(slide, Inches(0.5), Inches(1.12), Inches(12.2), Inches(0.32), subtitle, 12, MUTED)
 
 
 def so_what(slide, text):
-    box(slide, Inches(0.4), Inches(6.48), Inches(12.5), Inches(0.72), CARD2, AMBER)
-    rect(slide, Inches(0.4), Inches(6.48), Inches(0.1), Inches(0.72), AMBER)
-    put(slide, Inches(0.7), Inches(6.48), Inches(12.0), Inches(0.72),
-        "所以  ·  " + text, 13, WHITE, True, valign=MSO_ANCHOR.MIDDLE)
+    box(slide, Inches(0.5), Inches(6.35), Inches(12.3), Inches(0.7), RGBColor(0xFF, 0xF0, 0xF0), RED)
+    rect(slide, Inches(0.5), Inches(6.35), Inches(0.08), Inches(0.7), RED)
+    put(slide, Inches(0.75), Inches(6.35), Inches(11.9), Inches(0.7),
+        "所以  ·  " + text, 13, NAVY, True, valign=MSO_ANCHOR.MIDDLE)
 
 
 def build():
-    prs = Presentation()
-    prs.slide_width, prs.slide_height = W, H
-    blank = prs.slide_layouts[6]
+    prs = Presentation(TEMPLATE)
+    delete_all_slides(prs)
 
-    # ========== 1 封面 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    rect(s, 0, 0, Inches(0.16), H, CYAN)
+    # 1 封面
+    s = blank_slide(prs)
+    rect(s, 0, 0, Inches(0.12), prs.slide_height, RED)
     put(s, Inches(0.7), Inches(1.25), Inches(12), Inches(0.32),
-        "立项汇报  ·  物理 = 视频 / 音频 / 文字之外的传感器信号", 14, AMBER, True)
-    put(s, Inches(0.7), Inches(1.72), Inches(12), Inches(0.85), "AI 物理感知平台", 40, WHITE, True)
-    put(s, Inches(0.7), Inches(2.58), Inches(12), Inches(0.42),
-        "做信号操作系统，不做语言大模型，不做世界视频", 18, SOFT)
-    box(s, Inches(0.7), Inches(3.2), Inches(11.9), Inches(1.45), CARD, STROKE)
-    put(s, Inches(0.95), Inches(3.35), Inches(11.4), Inches(1.15),
-        "VLM 已吃掉图声文；雷达 / IMU / EMG / UWB 仍是一路一个小模型。我们补中间层。",
-        16, SOFT)
+        "华为内部立项  ·  融合 TimesFM-3 + UniTS/MOMENT + LIMU-BERT-X", 14, RED, True)
+    put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
+    put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
+        "一个物理时序底座，同时出预测与分类", 18, BODY)
+    box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.2), CARD, STROKE)
+    put(s, Inches(0.95), Inches(3.25), Inches(11.4), Inches(0.95),
+        "TimesFM-3 管零样本预测；UniTS / MOMENT 管多任务与分类；LIMU-BERT-X 管 IMU 表征。\n"
+        "融合成 PhysFM：PhysIngest → 共享表征 → 预测头 + 分类头。不做场景应用、不做整机。",
+        15, BODY)
     for i, (k, v) in enumerate([
-        ("做什么", "四座塔：雷达 · IMU · EMG · UWB"),
-        ("怎么验证", "加进来必须加分"),
-        ("先打哪", "无接触生命体征"),
+        ("预测", "TimesFM-3 式 CPM · 9 分位数"),
+        ("分类", "UniTS 任务 token / MOMENT 头"),
+        ("IMU 先验", "LIMU-BERT-X · 143 万小时"),
     ]):
         left = Inches(0.7 + i * 4.05)
-        box(s, left, Inches(4.9), Inches(3.85), Inches(1.55), CARD2, STROKE)
-        put(s, left + Inches(0.2), Inches(5.05), Inches(3.45), Inches(0.32), k, 13, CYAN, True)
-        put(s, left + Inches(0.2), Inches(5.42), Inches(3.45), Inches(0.85), v, 15, WHITE)
-    put(s, Inches(0.7), Inches(6.7), Inches(8), Inches(0.3), "2026  ·  蓝图", 13, MUTED)
-    put(s, Inches(10.3), Inches(6.7), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 13, MUTED, align=PP_ALIGN.RIGHT)
+        box(s, left, Inches(4.55), Inches(3.85), Inches(1.7), WHITE, STROKE)
+        rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
+        put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
+        put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  8 页架构版", 12, MUTED)
+    put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
+    put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
-    # ========== 2 请拍板（隐藏） ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "0  请拍板", "立项只拍三件事，其余都是证据",
-           "讲完这页，后面 10 分钟只为这三句补材料。")
-    asks = [
-        (CYAN, "1  做什么",
-         "信号操作系统。\n雷达 / IMU / EMG / UWB 进同一套时钟、tokenizer、评测。",
-         "不做语言大模型、世界视频、芯片、整机、眼镜整机。"),
-        (AMBER, "2  怎么验证",
-         "加上雷达、IMU、EMG 或 UWB，任务分必须上升。\n视觉解锁率、FID 一律不算。",
-         "加进来不加分，禁止称「多传感融合」。"),
-        (GREEN, "3  先打哪",
-         "无接触生命体征。\n不贴电极，被子里也要有呼吸。",
-         "90 天演示「加雷达，被子里才有读数」。钥匙、写字、运动随后建塔。"),
-    ]
-    for i, (c, t, a, b) in enumerate(asks):
-        left = Inches(0.4 + i * 4.3)
-        box(s, left, Inches(1.35), Inches(4.15), Inches(4.95), CARD, STROKE)
-        rect(s, left, Inches(1.35), Inches(0.12), Inches(4.95), c)
-        put(s, left + Inches(0.3), Inches(1.55), Inches(3.65), Inches(0.45), t, 18, c, True)
-        put(s, left + Inches(0.3), Inches(2.15), Inches(3.65), Inches(2.2), a, 16, WHITE)
-        put(s, left + Inches(0.3), Inches(4.5), Inches(3.65), Inches(1.5), b, 14, SOFT)
-    footer(s, 2, "拍板")
-    hide(s)
-
-    # ========== 3 规格 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "1  规格", "主吃六路；视频 / 音频 / 文本只作对齐教师",
-           "禁止把摄像头当训练与评测的主输入。")
-    defs = [
-        (GREEN, "本平台取", "雷达 · IMU · EMG · 接近光 · TOF · TP", "主模态"),
-        (MUTED, "不做 A", "世界模型：Cosmos / Dreamer / JEPA", "不做"),
-        (MUTED, "不做 B", "Occupancy：Tesla / World Labs Marble", "不做"),
-    ]
-    for i, (color, tag, desc, badge) in enumerate(defs):
-        left = Inches(0.4 + i * 4.3)
-        box(s, left, Inches(1.32), Inches(4.15), Inches(0.95), CARD, color)
-        put(s, left + Inches(0.16), Inches(1.38), Inches(2.4), Inches(0.28), tag, 12, color, True)
-        put(s, left + Inches(2.4), Inches(1.38), Inches(1.55), Inches(0.28), badge, 11, color, True, PP_ALIGN.RIGHT)
-        put(s, left + Inches(0.16), Inches(1.7), Inches(3.8), Inches(0.48), desc, 14, WHITE)
-    fams = [
-        ("雷达", "距离 / 速度 / 微动", "第一塔：生命体征"),
-        ("IMU", "加速度 / 角速度", "第二塔：运动状态"),
-        ("EMG", "肌腱表面电位", "第三塔：微手势、写字"),
-        ("UWB", "无线电 TOF", "第四塔：数字钥匙"),
-        ("接近光 / TOF", "近距有无 / 距离图", "常开、暗光可用"),
-        ("TP", "触点 / 掌误触", "接触事件"),
-    ]
-    for i, (a, b, c) in enumerate(fams):
-        r, col = divmod(i, 3)
-        left = Inches(0.4 + col * 4.3)
-        top = Inches(2.42 + r * 1.95)
-        box(s, left, top, Inches(4.15), Inches(1.82), CARD, STROKE)
-        put(s, left + Inches(0.18), top + Inches(0.14), Inches(3.8), Inches(0.42), a, 18, CYAN, True)
-        put(s, left + Inches(0.18), top + Inches(0.62), Inches(3.8), Inches(0.45), b, 15, WHITE)
-        put(s, left + Inches(0.18), top + Inches(1.14), Inches(3.8), Inches(0.5), c, 14, AMBER)
-    so_what(s, "四座塔按商用场景立项。义肢、针电极不做。")
-    footer(s, 3, "规格")
-
-    # ========== 4 为何现在 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "1  为什么现在", "图声文有基础模型，物理信号还没有操作系统",
-           "四条公开结果。汇报时只念标题，细节留问答。")
-    facts = [
-        ("雷达能进大模型", "HoloLLM：mmWave 注入 VLM，人体感知最高 +30%。"),
-        ("EMG 已开卖，仍要试戴", "Meta Neural Band 2025-09 开卖，近 20 万人体验。"),
-        ("IMU 如何对齐其他模态", "Babel：ImageBind 对 IMU 几乎无效。"),
-        ("IMU 预训练模型", "LIMU-BERT：手机上可实时跑。"),
-    ]
-    for i, (t, d) in enumerate(facts):
-        r, c = divmod(i, 2)
-        left = Inches(0.4 + c * 6.45)
-        top = Inches(1.35 + r * 2.15)
-        box(s, left, top, Inches(6.2), Inches(2.0), CARD, STROKE)
-        put(s, left + Inches(0.22), top + Inches(0.2), Inches(5.75), Inches(0.5), t, 18, CYAN, True)
-        put(s, left + Inches(0.22), top + Inches(0.8), Inches(5.75), Inches(1.0), d, 15, SOFT)
-    so_what(s, "缺口在接入与表征，不在再训一个视觉或语言大模型。")
-    footer(s, 4, "缺口")
-
-    # ========== 5 代际 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "2  代际", "主线不是模型更大，而是信号如何被编码",
-           "G2 交付，G3 做底座，主攻 G4。Hub 已出货，缺的是分传感器 token。")
-    gens = [
-        ("G0", "滤波", "Kalman / 阈值", MUTED),
-        ("G1", "单模态深度", "IMU-LSTM / 雷达 CNN", SOFT),
-        ("G2", "Hub 规则+小网", "端侧量产主力", CYAN),
-        ("G3", "传感基础模型", "LIMU-BERT / Babel", INDIGO),
-        ("G4", "分传感器 token", "当前窗口", AMBER),
-        ("G5", "传感 OS", "预埋接口", GREEN),
-    ]
-    for i, (g, name, tech, color) in enumerate(gens):
-        left = Inches(0.32 + i * 2.16)
-        hot = g in ("G3", "G4")
-        box(s, left, Inches(1.32), Inches(2.06), Inches(2.05),
-            RGBColor(0x1C, 0x2C, 0x48) if hot else CARD,
-            AMBER if g == "G4" else (CYAN if g == "G3" else STROKE))
-        put(s, left + Inches(0.08), Inches(1.42), Inches(1.9), Inches(0.38), g, 18,
-            AMBER if g == "G4" else (CYAN if g == "G3" else MUTED), True, PP_ALIGN.CENTER)
-        put(s, left + Inches(0.08), Inches(1.88), Inches(1.9), Inches(0.6), name, 14, WHITE, True, PP_ALIGN.CENTER)
-        put(s, left + Inches(0.08), Inches(2.55), Inches(1.9), Inches(0.65), tech, 12, SOFT, align=PP_ALIGN.CENTER)
-    jumps = [
-        ("不跳 G0→G1", "换机型，手工阈值全失效。LIMU-BERT 证明 IMU 可离开阈值。", CYAN),
-        ("不跳 G1→G2", "入袋 / 抬腕各写 if-else。Hub 已把多路接到低功耗核。", INDIGO),
-        ("不跳 G3→G4", "每加一路雷达、IMU、UWB 或 EMG 重写产线。Babel 证明可以只加一座塔。", AMBER),
-    ]
-    for i, (k, v, c) in enumerate(jumps):
-        top = Inches(3.55 + i * 0.9)
-        box(s, Inches(0.4), top, Inches(12.5), Inches(0.82), CARD, STROKE)
-        rect(s, Inches(0.4), top, Inches(0.1), Inches(0.82), c)
-        put(s, Inches(0.7), top, Inches(3.2), Inches(0.82), k, 15, c, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(4.0), top, Inches(8.6), Inches(0.82), v, 15, SOFT, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 5, "代际")
-
-    # ========== 6 验证 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "3  验证", "加上哪座塔，哪个场景就必须更好",
-           "无采样率、单位、时间基的数据包，Ingest 直接拒收。")
+    # 2 规格
+    s = blank_slide(prs)
+    header(s, "1  规格", "融合底座：TimesFM 主干 + 双头 + IMU 预训练",
+           "目标：同一批 patch token，同时给出分位数预测与类别 logits。")
     rows = [
-        ("雷达", "生命体征", "被子里没有读数", "被子里也有呼吸"),
-        ("IMU", "运动状态", "抬腕 / 入袋分不清", "抬腕 / 入袋可识别"),
-        ("EMG", "眼镜写字", "微点 / 笔画做不到", "微点 / 笔画可用"),
-        ("UWB", "数字钥匙", "BLE 会被中继骗过", "抗中继，走近才开"),
+        ("主干", "TimesFM-3：20 层 Mixing Transformer，d=1280，16 heads"),
+        ("patch", "输入 32 / 输出 64；上下文上限 15,360；变元上限 32"),
+        ("预测头", "Linear 1280→64×9，CPM 一次解码，median=q50"),
+        ("分类头", "UniTS 任务 token 或 MOMENT linear-probe；可 LoRA 微调"),
+        ("IMU 初始化", "LIMU-BERT-X：143 万小时、6 万人、1.1K 机型，端侧可用"),
+        ("许可", "TimesFM-3 权重 NC；UniTS / MOMENT / LIMU-BERT 公开可研究。商用自训。"),
     ]
-    box(s, Inches(0.4), Inches(1.32), Inches(12.5), Inches(0.5), RGBColor(0x1A, 0x2A, 0x42))
-    for j, h in enumerate(["塔", "场景", "没有", "加上"]):
-        put(s, Inches(0.6 + j * 3.1), Inches(1.32), Inches(2.9), Inches(0.5), h, 14, CYAN, True, valign=MSO_ANCHOR.MIDDLE)
-    for i, (a, b, c, d) in enumerate(rows):
-        top = Inches(1.88 + i * 1.05)
-        box(s, Inches(0.4), top, Inches(12.5), Inches(0.95), CARD if i % 2 == 0 else CARD2, STROKE)
-        put(s, Inches(0.6), top, Inches(2.9), Inches(0.95), a, 16, WHITE, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(3.7), top, Inches(2.9), Inches(0.95), b, 15, AMBER, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(6.8), top, Inches(2.9), Inches(0.95), c, 15, MUTED, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(9.9), top, Inches(2.9), Inches(0.95), d, 15, WHITE, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 6, "验证")
+    for i, (k, v) in enumerate(rows):
+        r, c = divmod(i, 2)
+        left = Inches(0.5 + c * 6.35)
+        top = Inches(1.5 + r * 1.5)
+        box(s, left, top, Inches(6.15), Inches(1.35), WHITE, STROKE)
+        put(s, left + Inches(0.22), top + Inches(0.18), Inches(5.7), Inches(0.35), k, 15, RED, True)
+        put(s, left + Inches(0.22), top + Inches(0.58), Inches(5.7), Inches(0.6), v, 14, BODY)
+    so_what(s, "TimesFM 原生没有分类头；要「预测+分类」必须融合 UniTS 式任务 token 或 MOMENT 式探针。")
+    footer(s, 2, "规格")
 
-    # ========== 7 对标 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "4  对标", "缺的不是器件，是中间那层操作系统",
-           "抄时钟与 schema，抄分传感器塔。不抄封闭小模型，不卖整机，不造芯片。")
-    layers3 = [
-        ("上  整机", "不卖整机",
-         "Meta Neural Band、BMW 数字钥匙、睡眠雷达卖体验。责任绑在整机，原始波形不对外开放。", CYAN, False),
-        ("中  信号 OS  ← 我们", "主航道",
-         "Hub / Core Motion 停在 G2。我们补四座 tokenizer，以及「加雷达 / 加 IMU / 加 EMG / 加 UWB 必须更好」的表。", AMBER, True),
-        ("下  器件", "不造芯片",
-         "Bosch IMU、Infineon 雷达、ST UWB、干电极 EMG。集成探头，不自研硅。", MUTED, False),
+    # 3 输入与流水线
+    s = blank_slide(prs)
+    header(s, "2  总览", "四段流水：输入 → 特征 → 表征 → 双头",
+           "物理传感器只作为变元接入：target / past-only / past-future。")
+    steps = [
+        ("输入", "target (B,U,C)\npast-only (B,Vpo,C)\npast-future (B,W,C+H)", RED),
+        ("特征提取", "pad32 · 去趋势 · 堆叠 V\n切 patch · RevIN · ResidualBlock", ORANGE),
+        ("共享表征", "20 × MixingTransformer\n因果时间注意力 + 变元注意力", CYAN),
+        ("双头", "预测：Linear 1280→64×9\n分类：任务 token / linear probe", GREEN),
     ]
-    for i, (t, badge, a, color, hot) in enumerate(layers3):
-        top = Inches(1.35 + i * 1.7)
-        box(s, Inches(0.4), top, Inches(12.5), Inches(1.55),
-            RGBColor(0x1C, 0x2C, 0x48) if hot else CARD, color if hot else STROKE)
-        put(s, Inches(0.7), top + Inches(0.18), Inches(8.5), Inches(0.4), t, 20, color, True)
-        put(s, Inches(9.3), top + Inches(0.18), Inches(3.3), Inches(0.4), badge, 14,
-            GREEN if hot else MUTED, True, PP_ALIGN.RIGHT)
-        put(s, Inches(0.7), top + Inches(0.7), Inches(12.0), Inches(0.65), a, 16, SOFT)
-    footer(s, 7, "对标")
+    for i, (t, d, c) in enumerate(steps):
+        left = Inches(0.45 + i * 3.2)
+        box(s, left, Inches(1.55), Inches(3.05), Inches(3.15), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
+        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), f"{i+1}. {t}", 16, c, True)
+        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.1), d, 13, BODY)
+    box(s, Inches(0.5), Inches(4.9), Inches(12.3), Inches(1.3), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.05), Inches(11.9), Inches(0.3), "物理变元怎么接（不是应用场景）", 14, RED, True)
+    put(s, Inches(0.7), Inches(5.4), Inches(11.9), Inches(0.7),
+        "IMU / EMG 作 target 或 past-only；已知未来通道作 past-future，horizon 上保持可见。\n"
+        "变元上限 32。无 schema / 时钟 / 质量位则拒收——这是 Ingest，TimesFM 不管。",
+        13, BODY)
+    footer(s, 3, "总览")
 
-    # ========== 8 TOP3 团队 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "4  TOP3 团队", "抄架构，不抄产品；三家各对应一座塔",
-           "标准：把非视听文传感器当一等模态，且有可复用表征。")
-    teams = [
-        (GREEN, "1  港科大 Mo Li",
-         "LIMU-BERT → Babel",
-         "IMU 自监督基础模型；\nWi‑Fi / 雷达 / IMU / LiDAR\n可扩展对齐，不必全配对。",
-         "我们抄：分模态塔 +\n可追加对齐。"),
-        (CYAN, "2  南洋理工 MARS",
-         "HoloLLM",
-         "把 mmWave / LiDAR / 红外\n注入 VLM；稀有模态注入器，\n不幻想万能 ViT。",
-         "我们抄：雷达塔接入 +\n异构注入器。"),
-        (AMBER, "3  Meta FAIR / Reality",
-         "DIGIT · Sparsh · Neural Band",
-         "触觉工具化（Plexus）；\n腕带 EMG 已开卖，\n仍强制店内试戴。",
-         "我们抄：工具化形态 +\nEMG 塔与接触几何。"),
+    # 4 特征提取
+    s = blank_slide(prs)
+    header(s, "3  特征提取", "数据是 patch token，不是逐步 RNN 状态",
+           "每个时间 patch 拼成 192 维，ResidualBlock → 1280 维 token。")
+    feats = [
+        ("1 对齐", "context 左 pad 到 32 倍数。horizon 上目标全 mask；past-future 在 horizon 可见。"),
+        ("2 变元堆叠", "target ⊕ past-only ⊕ past-future 沿 V 维拼接，供变元注意力交互。"),
+        ("3 去趋势", "可选线性去趋势；去趋势后 std 明显更小（阈值 0.5）才减直线，预测后再加回。"),
+        ("4 RevIN", "逐变元 running mean/std。horizon 用 CPM：mask 目标 patch，用上下文统计并可迭代修正。"),
+        ("5 Patch 嵌入", "当前 32 + roll 未来 64 + mask 96 → concat 192 → ResidualBlock（两层线性+ReLU+残差）→ d=1280。"),
     ]
-    for i, (c, name, work, what, so) in enumerate(teams):
-        left = Inches(0.4 + i * 4.3)
-        box(s, left, Inches(1.32), Inches(4.15), Inches(4.95), CARD, STROKE)
-        rect(s, left, Inches(1.32), Inches(0.12), Inches(4.95), c)
-        put(s, left + Inches(0.3), Inches(1.5), Inches(3.65), Inches(0.4), name, 16, c, True)
-        put(s, left + Inches(0.3), Inches(2.0), Inches(3.65), Inches(0.4), work, 14, AMBER, True)
-        put(s, left + Inches(0.3), Inches(2.55), Inches(3.65), Inches(1.8), what, 14, SOFT)
-        put(s, left + Inches(0.3), Inches(4.5), Inches(3.65), Inches(1.5), so, 14, WHITE, True)
-    footer(s, 8, "团队")
+    for i, (t, d) in enumerate(feats):
+        top = Inches(1.48 + i * 0.9)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.82), WHITE if i % 2 == 0 else CARD, STROKE)
+        put(s, Inches(0.7), top, Inches(2.4), Inches(0.82), t, 16, RED, True, valign=MSO_ANCHOR.MIDDLE)
+        put(s, Inches(3.2), top, Inches(9.4), Inches(0.82), d, 14, BODY, valign=MSO_ANCHOR.MIDDLE)
+    footer(s, 4, "特征提取")
 
-    # ========== 9 四场景对照 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "5  商用场景", "四件事倒逼四座塔：雷达 · IMU · EMG · UWB",
-           "汇报只讲这一页。先打生命体征。细证据在附录，被问再翻。")
-    scenes = [
-        ("眼镜写字 / 微手势",
-         ["手在桌下也能写、口袋里也能点", "眼镜 OEM / XR", "手在桌下、口袋里，会议室不能出声", "加 EMG：微点 / 写字可用", "EMG 塔 + 对比表"]),
-        ("无接触生命体征  ← 先打",
-         ["不贴电极，被子里也要有呼吸心跳", "养老 / 睡眠硬件", "卧室卫生间不能常开录像", "加雷达：被子里也有读数", "雷达微动塔 + 对比表"]),
-        ("运动状态识别",
-         ["抬腕亮屏、入袋静音、跌倒报警", "手机 / 手表 / 耳机", "摄像头常开功耗高、隐私差", "加 IMU：抬腕 / 入袋可识别", "IMU 塔 + 对比表"]),
-        ("UWB 数字钥匙",
-         ["走近要开，假的「很近」要识破", "车身电子 + 手机 OEM", "中继是无线电欺骗，不是图像", "加 UWB：抗中继，走近才开", "UWB 塔 + 抗中继评测"]),
+    # 5 Mixing Transformer
+    s = blank_slide(prs)
+    header(s, "4  表征", "Mixing Transformer 学的是条件表征，预测与分类共用",
+           "每层对 (B, V, N, 1280) 做：时间注意力 → 变元注意力 → FFN。堆叠 20 层。")
+    cards = [
+        (CYAN, "时间注意力",
+         "因果 + RoPE。\n每个变元独立：第 t 个 patch 只能看 ≤ t。\n建模趋势、季节、水平漂移。"),
+        (ORANGE, "变元注意力",
+         "同一时刻、跨通道、非因果。\n目标与协变量在同一 patch 交换信息。\n这是 3.0 相对 2.x 单变量的核心。"),
+        (GREEN, "FFN",
+         "RMSNorm + ReLU MLP + 残差。\n输出条件表征，同时供预测头与分类头。\nUniTS / MOMENT 证明这套表征可做分类。"),
     ]
-    box(s, Inches(0.35), Inches(1.3), Inches(12.6), Inches(0.48), RGBColor(0x1A, 0x2A, 0x42))
-    put(s, Inches(0.45), Inches(1.3), Inches(2.3), Inches(0.48), "", 12, CYAN, True, valign=MSO_ANCHOR.MIDDLE)
-    for j, (name, _) in enumerate(scenes):
-        put(s, Inches(2.8 + j * 2.55), Inches(1.3), Inches(2.4), Inches(0.48), name, 13, CYAN, True,
-            valign=MSO_ANCHOR.MIDDLE)
-    labels = ["一句话", "谁付钱", "为何不用摄像头", "加哪路更好", "我们交什么"]
-    for i, lab in enumerate(labels):
-        top = Inches(1.84 + i * 0.88)
-        box(s, Inches(0.35), top, Inches(12.6), Inches(0.82), CARD if i % 2 == 0 else CARD2, STROKE)
-        put(s, Inches(0.45), top, Inches(2.25), Inches(0.82), lab, 13, AMBER, True, valign=MSO_ANCHOR.MIDDLE)
-        for j, (_, cells) in enumerate(scenes):
-            put(s, Inches(2.8 + j * 2.55), top, Inches(2.4), Inches(0.82), cells[i], 13, WHITE,
-                valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 9, "场景")
+    for i, (c, t, d) in enumerate(cards):
+        left = Inches(0.5 + i * 4.2)
+        box(s, left, Inches(1.55), Inches(4.0), Inches(3.55), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(0.1), Inches(3.55), c)
+        put(s, left + Inches(0.25), Inches(1.75), Inches(3.5), Inches(0.45), t, 18, c, True)
+        put(s, left + Inches(0.25), Inches(2.4), Inches(3.5), Inches(2.4), d, 15, BODY)
+    so_what(s, "表征层不动 TimesFM；分类能力来自在表征上接 UniTS 任务 token 或 MOMENT 探针。")
+    footer(s, 5, "表征")
 
-    # ========== 10 先打生命体征 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "5  先打哪", "无接触生命体征：90 天证明「加雷达，被子里才有读数」",
-           "不先做眼镜整机，也不先做开锁产品。先立能当场验证的雷达微动塔。")
-    box(s, Inches(0.4), Inches(1.32), Inches(8.0), Inches(5.0), CARD, STROKE)
-    put(s, Inches(0.65), Inches(1.48), Inches(7.5), Inches(0.4), "为什么先打这一件，不先打另外三件", 16, CYAN, True)
-    triples = [
-        ("体征", "卧室不能装摄像头；静息就能录；加雷达当场能看。"),
-        ("运动", "后做。抬腕 / 入袋已有 Hub，差异化小。"),
-        ("眼镜", "后做。干电极要拟合，Meta 自己还强制店内试戴。"),
-        ("钥匙", "后做。CCC / 主机厂闭环，外面难录真实中继包。"),
+    # 6 预测
+    s = blank_slide(prs)
+    header(s, "5  预测", "decode() 非自回归：整段 context+horizon 只走一遍",
+           "TimesFM3Torch.decode() → forward() → TimesFM3Forecaster.predict_batch()。")
+    preds = [
+        ("输出头", "Linear(1280 → 64×9)。每个输入 patch 预测未来 64 步、9 个分位数。"),
+        ("CPM", "horizon 目标 patch 先 mask。用上下文统计量做 RevIN，并可迭代用模型估计修正。"),
+        ("逆变换", "分位数在 RevIN 空间；逆归一化后再加回去趋势。"),
+        ("Stitching", "相邻窗口重叠 32 点，拼出任意 horizon（可超过 64）。"),
+        ("读出", "点预测：quantiles[..., 4]（0.5）。概率：9 条分位轨迹，做区间与校准。"),
+        ("Eval", "点预测 MAE；q10–q90 覆盖率。对照 TimesFM-3 单变量 / 多变量两种模式。"),
     ]
-    for i, (a, b) in enumerate(triples):
-        top = Inches(2.05 + i * 0.75)
-        put(s, Inches(0.75), top, Inches(1.6), Inches(0.7), a, 16, AMBER, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(2.4), top, Inches(5.7), Inches(0.7), b, 16, WHITE, valign=MSO_ANCHOR.MIDDLE)
-    put(s, Inches(0.65), Inches(4.7), Inches(7.5), Inches(1.35),
-        "90 天成功：盖毯静息呼吸可出数；加雷达后读数稳定。\n"
-        "失败：加雷达前后分数几乎不变——说明雷达没起作用。",
-        15, SOFT)
-    box(s, Inches(8.6), Inches(1.32), Inches(4.3), Inches(5.0), CARD2, STROKE)
-    put(s, Inches(8.8), Inches(1.48), Inches(3.95), Inches(0.4), "90 天交什么", 16, AMBER, True)
-    put(s, Inches(8.8), Inches(2.05), Inches(3.95), Inches(4.0),
-        "冻结：雷达微动 schema\n"
-        "交付：录包 → 同步 → Eval\n"
-        "演示：加雷达，被子里才有读数\n\n"
-        "随后三座塔\n"
-        "IMU 运动状态\n"
-        "UWB 数字钥匙\n"
-        "EMG 微手势 / 桌面写字\n\n"
-        "不交\n"
-        "医疗级心率、眼镜整机、开锁产品、语言头",
-        15, SOFT)
-    footer(s, 10, "第一包")
+    for i, (t, d) in enumerate(preds):
+        r, c = divmod(i, 2)
+        left = Inches(0.5 + c * 6.35)
+        top = Inches(1.5 + r * 1.55)
+        box(s, left, top, Inches(6.15), Inches(1.42), WHITE, STROKE)
+        put(s, left + Inches(0.22), top + Inches(0.15), Inches(5.7), Inches(0.35), t, 16, RED, True)
+        put(s, left + Inches(0.22), top + Inches(0.55), Inches(5.7), Inches(0.75), d, 13, BODY)
+    footer(s, 6, "预测")
 
-    # ========== 11 路线（隐藏） ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "6  怎么做", "每个阶段必须有可证伪的成功标准",
-           "不做：语言大模型、世界视频、整机 UX、自研芯片、医疗注册。")
-    phases = [
-        ("P0  0–3 月", "雷达体征塔",
-         "冻结雷达微动 schema。\n成功：加雷达，被子里有读数。\n失败：仍用 CSV 对时钟。", GREEN),
-        ("P1  3–6 月", "IMU 运动塔",
-         "抬腕 / 入袋 / 跌倒。\n成功：加 IMU 必须更好。\n失败：复用 Hub 规则。", CYAN),
-        ("P2  6–12 月", "UWB 钥匙塔",
-         "数字钥匙 Pack。\n成功：只加一座塔，不改主干。\n失败：每加一路分叉仓库。", INDIGO),
-        ("P3  12–18 月", "EMG 写字塔",
-         "微手势 + 桌面写字。\n成功：加 EMG 必须更好。\n出汗 / 位移进评测。", AMBER),
-    ]
-    for i, (a, b, c, color) in enumerate(phases):
-        left = Inches(0.35 + i * 3.24)
-        box(s, left, Inches(1.35), Inches(3.1), Inches(5.7), CARD, STROKE)
-        rect(s, left, Inches(1.35), Inches(3.1), Inches(0.1), color)
-        put(s, left + Inches(0.18), Inches(1.6), Inches(2.75), Inches(0.45), a, 16, color, True)
-        put(s, left + Inches(0.18), Inches(2.15), Inches(2.75), Inches(0.45), b, 18, WHITE, True)
-        put(s, left + Inches(0.18), Inches(2.8), Inches(2.75), Inches(3.8), c, 15, SOFT)
-    footer(s, 11, "路线")
-    hide(s)
+    # 7 分类
+    s = blank_slide(prs)
+    header(s, "6  分类", "分类不是 TimesFM 内建；融合 UniTS / MOMENT / LIMU-BERT-X",
+           "规则只做异常示意；可学习分类必须接在共享表征上。")
+    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
+    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "路 A  规则下游（零样本）", 17, MUTED, True)
+    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
+        "历史段：去趋势残差 z-score。\n|z|≥3 CRITICAL，≥2 WARNING，否则 NORMAL。\n\n"
+        "未来段：观测是否落在 q10–q90 / q20–q80 外。\n区间外 → 异常。\n\n"
+        "不改权重，不能当「可学习分类」。",
+        14, BODY)
+    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), RED)
+    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "路 B  共享表征 + 分类头", 17, RED, True)
+    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
+        "UniTS：任务 token 把预测 / 分类 / 填补 / 异常收进同一套参数。\n"
+        "MOMENT：掩码预训练编码器 + linear probe / 分类头。\n"
+        "LIMU-BERT-X：IMU 掩码预训练，直接初始化 IMU 变元。\n\n"
+        "物理信号分类走这条；LoRA 微调参照 timesfm-forecasting/examples/finetuning/。",
+        14, BODY)
+    footer(s, 7, "分类")
 
-    # ========== 12 决策（隐藏） ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "决策", "请拍板的就是封面那三句",
-           "第一包：无接触生命体征。第二包：IMU 运动状态。第三包：UWB 数字钥匙。第四包：EMG 写字。")
+    # 8 决策
+    s = blank_slide(prs)
+    header(s, "决策", "平台交付「预测+分类」融合底座，不交付应用 Pack",
+           "TimesFM 管预测，UniTS / MOMENT 管分类，LIMU-BERT-X 管 IMU。")
     lines = [
-        ("规格", "雷达 / IMU / EMG / 接近光 / TOF / TP。UWB 按无线电 TOF 接入。"),
-        ("不做", "语言大模型、世界视频、芯片、整机、眼镜整机、医疗级心率注册。"),
-        ("验证", "加雷达 / 加 IMU / 加 EMG / 加 UWB；不加分即失败。"),
-        ("先打", "无接触生命体征：90 天交出「加雷达，被子里才有读数」。"),
-        ("场景", "眼镜写字 / 微手势 · 无接触生命体征 · 运动状态 · UWB 数字钥匙。"),
-        ("产品", "Ingest + 四座 Tokenizer + Eval。"),
+        ("主干", "PhysIngest → pad/RevIN/patch token → 20 层 Mixing Transformer → 双头。"),
+        ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 分位覆盖率。"),
+        ("分类", "UniTS 任务 token / MOMENT linear probe；可 LoRA。对照 LIMU-BERT-X。"),
+        ("IMU", "用 LIMU-BERT-X 初始化 IMU 变元；TartanIMU 作运动估计参照。"),
+        ("许可", "TimesFM-3 权重 NC；UniTS / MOMENT / LIMU-BERT 公开。商用自训。"),
+        ("不做", "场景 Pack、整机、芯片、盘古、世界视频、把 TimesFM 当分类模型宣传。"),
     ]
     for i, (k, v) in enumerate(lines):
-        top = Inches(1.32 + i * 0.85)
-        box(s, Inches(0.4), top, Inches(12.5), Inches(0.76), CARD, STROKE)
-        put(s, Inches(0.65), top, Inches(1.8), Inches(0.76), k, 18, CYAN, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(2.6), top, Inches(10.0), Inches(0.76), v, 16, WHITE, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 12, "决策")
-    hide(s)
+        top = Inches(1.5 + i * 0.8)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.72), WHITE if i % 2 == 0 else CARD, STROKE)
+        put(s, Inches(0.7), top, Inches(1.6), Inches(0.72), k, 16, RED, True, valign=MSO_ANCHOR.MIDDLE)
+        put(s, Inches(2.5), top, Inches(10.1), Inches(0.72), v, 14, NAVY, valign=MSO_ANCHOR.MIDDLE)
+    footer(s, 8, "决策")
 
-    # ========== 13 来源 ==========
-    s = prs.slides.add_slide(blank)
-    bg(s)
-    header(s, "附录", "被问到数字时翻这一页，汇报正文不念",
-           "厂商口径单独标明。阈值用自有 Pack 标定后写入 Eval。")
-    srcs = [
-        "Meta Neural Band（2025-09）：与 Ray-Ban Display 捆绑 799 美元；近 20 万受试者；强制店内试戴；手写消息未上线",
-        "Mudra Link 约 249 美元；Apple 表带电极专利 + EMBridge（NeurIPS 2025 workshop），手表未出货",
-        "AKM AK5816AIM（2026-07 量产）：无摄像头跌倒 + 呼吸；模块口径写静息 / 睡眠，走动伪迹未收口",
-        "BMW Digital Key Plus / 奔驰：UWB 约 4 m 定左右侧防中继；CCC Digital Key 已上车",
-        "Babel SenSys 2025：ImageBind 对 IMU 几乎无效；LIMU-BERT 手机可实时跑；HoloLLM mmWave +30%",
-        "港科大 Mo Li：LIMU-BERT → UniHAR → Babel；南洋理工 MARS：HoloLLM；Meta FAIR：DIGIT / Sparsh / Neural Band",
-        "观察不进本版 TOP4：座舱 CPD、房间人感、肌电义肢（器械渠道）",
-    ]
-    for i, t in enumerate(srcs):
-        put(s, Inches(0.55), Inches(1.38 + i * 0.7), Inches(12.2), Inches(0.65), "·  " + t, 14, SOFT)
-    footer(s, 13, "来源")
-
-    out = r"g:\My Drive\Documents\AI物理感知\AI物理感知平台-传感器口径-汇报.pptx"
     try:
-        prs.save(out)
+        prs.save(OUT)
+        out = OUT
     except PermissionError:
-        out = r"g:\My Drive\Documents\AI物理感知\AI物理感知平台-传感器口径-汇报-v2.pptx"
+        out = OUT.replace(".pptx", "-v2.pptx")
         prs.save(out)
     print("SAVED", out)
     print("SLIDES", len(prs.slides))
-    hidden = sum(1 for sl in prs.slides if sl._element.get("show") == "0")
-    print("HIDDEN", hidden)
 
 
 if __name__ == "__main__":
     build()
+
+
