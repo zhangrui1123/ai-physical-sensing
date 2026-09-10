@@ -24,7 +24,7 @@ ORANGE = RGBColor(0xED, 0x6D, 0x00)
 INDIGO = RGBColor(0x00, 0x74, 0xCC)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 8
+TOTAL = 10
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -159,13 +159,67 @@ def build():
         rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  8 页平台版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  10 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
-    # 2 平台边界
+    # 2 模型盘点·通用时序
     s = blank_slide(prs)
-    header(s, "1  平台边界", "只做工具，不做场景；接口稳定，底座可换",
+    header(s, "1  模型盘点 · 通用时序", "通用时序基础模型：预测强，分类只有两家原生支持",
+           "口径：预训练目标决定原生能力；TimesFM / Chronos / Moirai 都只做预测。")
+    cols = [(0.5, 2.5), (3.05, 2.5), (5.6, 3.6), (9.25, 1.4), (10.7, 2.1)]
+    for (cx, cw), htxt in zip(cols, ["模型 / 出处", "预训练目标", "原生能力", "分类", "许可"]):
+        put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
+    rows = [
+        ("TimesFM-3\nGoogle 2026", "decoder-only\n分位数回归", "多变量预测 + 协变量；\nCPM 一次前向出 9 分位", "✗ 规则/加头", "3.0 权重 NC\n≤2.5 Apache"),
+        ("Chronos\nAmazon 2024", "离散 token\nT5 式 NTP", "单变量概率预测", "✗", "Apache-2.0"),
+        ("Moirai\nSalesforce 2024", "masked encoder\nany-variate", "多变量概率预测", "✗", "代码 Apache\n权重 CC-BY-NC"),
+        ("UniTS\nHarvard NeurIPS'24", "任务 token\nGEN/CLS 共享参数", "预测+分类+填补+异常一体；\n38 个数据集对比领先", "✓ 原生", "MIT"),
+        ("MOMENT\nCMU ICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\nlinear probe 即用", "✓ 探针", "MIT"),
+    ]
+    for i, row in enumerate(rows):
+        top = Inches(1.82 + i * 0.9)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.82), WHITE if i % 2 == 0 else CARD, STROKE)
+        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
+            if j == 0:
+                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 12, RED, True)
+            elif j == 3:
+                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 12,
+                    GREEN if cell.startswith("✓") else MUTED, True)
+            else:
+                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 11, BODY)
+    so_what(s, "预测底座选 TimesFM-3（多变量+协变量最强）；原生分类只有 UniTS / MOMENT——这正是双头设计的来源。")
+    footer(s, 2, "模型盘点")
+
+    # 3 模型盘点·物理传感器
+    s = blank_slide(prs)
+    header(s, "2  模型盘点 · 物理传感器", "IMU / EMG 专用模型：提供领域先验，不当平台底座",
+           "传感器模型规模小、端侧导向；与通用底座互补，不替代。")
+    cols = [(0.5, 2.6), (3.15, 3.3), (6.5, 4.4), (10.95, 1.85)]
+    for (cx, cw), htxt in zip(cols, ["模型 / 出处", "数据 / 预训练", "能力亮点", "部署 / 许可"]):
+        put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
+    rows = [
+        ("LIMU-BERT\nSenSys'21", "IMU 三轴\n掩码预训练", "端侧 HAR 开山作；小样本迁移到手机 / 腕戴", "手机可部署"),
+        ("LIMU-BERT-X\nMobiCom'25", "143 万小时 · 6 万人\n1.1K 种机型", "真实设备大规模泛化；端侧 HAR SOTA", "端侧"),
+        ("TartanIMU\nCVPR'25", "跨机器人 IMU\n位姿基础模型", "LoRA 仅 1.1M 参数即适配新机；200 FPS 在线推理", "机器人"),
+        ("PRIMUS\nICASSP'25", "IMU 多模态\n自监督对齐", "对齐预训练，提升下游 HAR / 健康任务", "研究"),
+        ("Babel\nSenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知表征", "研究"),
+        ("Meta EMG\nNature'25", "sEMG 腕带\n跨用户泛化", "0.88 手势/s；手写 20.9 WPM；个性化再 +16%", "腕带\nCC-BY-NC"),
+    ]
+    for i, row in enumerate(rows):
+        top = Inches(1.8 + i * 0.75)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.68), WHITE if i % 2 == 0 else CARD, STROKE)
+        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
+            if j == 0:
+                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.6), cell, 12, RED, True)
+            else:
+                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.6), cell, 11, BODY)
+    so_what(s, "平台用 LIMU-BERT-X 初始化 IMU 变元、用 Meta EMG 作 EMG 对照；底座仍是通用模型。")
+    footer(s, 3, "模型盘点")
+
+    # 4 平台边界
+    s = blank_slide(prs)
+    header(s, "3  平台边界", "只做工具，不做场景；接口稳定，底座可换",
            "明确划分：平台负责 Ingest → 表征 → 推理；场景方负责业务标签与闭环。")
     rows = [
         ("平台交付", "PhysIngest 校验、共享表征、predict() / classify()、评测工具链"),
@@ -183,11 +237,11 @@ def build():
         put(s, left + Inches(0.22), top + Inches(0.18), Inches(5.7), Inches(0.35), k, 15, RED, True)
         put(s, left + Inches(0.22), top + Inches(0.58), Inches(5.7), Inches(0.6), v, 14, BODY)
     so_what(s, "平台不抢场景：场景方调 predict/classify，平台方保接口与底座演进。")
-    footer(s, 2, "平台边界")
+    footer(s, 4, "平台边界")
 
-    # 3 接口定义
+    # 5 接口定义
     s = blank_slide(prs)
-    header(s, "2  接口定义", "Ingest 契约 + predict() + classify()",
+    header(s, "4  接口定义", "Ingest 契约 + predict() + classify()",
            "所有输入先过 Ingest；预测与分类共用同一批 patch token。")
     box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(2.0), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(0.08), RED)
@@ -208,11 +262,11 @@ def build():
     put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
         "label: 场景方注册的类别 id\nconfidence: softmax 概率\n基于共享表征 + 任务 token / linear probe。",
         13, BODY)
-    footer(s, 3, "接口")
+    footer(s, 5, "接口")
 
-    # 4 预测实现
+    # 6 预测实现
     s = blank_slide(prs)
-    header(s, "3  预测实现", "TimesFM-3 式：CPM 一次前向出 9 分位数",
+    header(s, "5  预测实现", "TimesFM-3 式：CPM 一次前向出 9 分位数",
            "预测是平台原生能力；接口固定，底座可换。")
     preds = [
         ("输入", "context ≤ 15,360；变元 ≤ 32；target / past-only / past-future。"),
@@ -229,11 +283,11 @@ def build():
         box(s, left, top, Inches(6.15), Inches(1.42), WHITE, STROKE)
         put(s, left + Inches(0.22), top + Inches(0.15), Inches(5.7), Inches(0.35), t, 16, RED, True)
         put(s, left + Inches(0.22), top + Inches(0.55), Inches(5.7), Inches(0.75), d, 13, BODY)
-    footer(s, 4, "预测")
+    footer(s, 6, "预测")
 
-    # 5 分类实现
+    # 7 分类实现
     s = blank_slide(prs)
-    header(s, "4  分类实现", "共享表征 + 任务 token / linear probe",
+    header(s, "6  分类实现", "共享表征 + 任务 token / linear probe",
            "分类不是 TimesFM 内建；平台用 UniTS / MOMENT 方式补。")
     box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
@@ -252,11 +306,11 @@ def build():
         "LIMU-BERT-X：IMU 掩码预训练，直接初始化 IMU 变元。\n\n"
         "场景方注册类别 → 平台微调 classify() → 返回 label + confidence。",
         14, BODY)
-    footer(s, 5, "分类")
+    footer(s, 7, "分类")
 
-    # 6 代际演进
+    # 8 代际演进
     s = blank_slide(prs)
-    header(s, "5  代际演进", "Gen1 零样本 → Gen2 指令微调 → Gen3 端侧",
+    header(s, "7  代际演进", "Gen1 零样本 → Gen2 指令微调 → Gen3 端侧",
            "接口不变，底座与能力逐代升级。")
     gens = [
         ("Gen1  零样本基线", "TimesFM-3 + UniTS/MOMENT + LIMU-BERT-X\npredict 零样本；classify 规则 / LoRA\n评测：MAE + 覆盖率 + macro-F1", RED),
@@ -273,11 +327,11 @@ def build():
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
         "演进原则：接口（Ingest / predict / classify）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
-    footer(s, 6, "代际演进")
+    footer(s, 8, "代际演进")
 
-    # 7 评测与许可
+    # 9 评测与许可
     s = blank_slide(prs)
-    header(s, "6  评测与许可", "同一接口，同一评测，不同底座可对比",
+    header(s, "8  评测与许可", "同一接口，同一评测，不同底座可对比",
            "平台提供统一评测工具链；许可边界随底座变化。")
     box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), GREEN)
@@ -293,12 +347,13 @@ def build():
     put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
         "TimesFM-3 权重：NC，商用必须自训底座。\n"
         "TimesFM ≤ 2.5：Apache-2.0，可商用。\n"
-        "UniTS / MOMENT / LIMU-BERT-X：公开可研究，商用前确认 license。\n\n"
+        "UniTS / MOMENT：MIT，可商用。\n"
+        "Moirai 权重 / Meta EMG：CC-BY-NC，仅研究。\n\n"
         "平台不绑定任何 NC 权重；接口层与许可层解耦。",
         14, BODY)
-    footer(s, 7, "评测与许可")
+    footer(s, 9, "评测与许可")
 
-    # 8 决策
+    # 10 决策
     s = blank_slide(prs)
     header(s, "决策", "平台交付接口与工具链，不交付场景语义",
            "接口固定，底座可换，代际演进向下兼容。")
@@ -315,7 +370,7 @@ def build():
         box(s, Inches(0.5), top, Inches(12.3), Inches(0.72), WHITE if i % 2 == 0 else CARD, STROKE)
         put(s, Inches(0.7), top, Inches(1.6), Inches(0.72), k, 16, RED, True, valign=MSO_ANCHOR.MIDDLE)
         put(s, Inches(2.5), top, Inches(10.1), Inches(0.72), v, 14, NAVY, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 8, "决策")
+    footer(s, 10, "决策")
 
     try:
         prs.save(OUT)
