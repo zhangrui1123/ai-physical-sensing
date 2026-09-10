@@ -24,7 +24,7 @@ ORANGE = RGBColor(0xED, 0x6D, 0x00)
 INDIGO = RGBColor(0x00, 0x74, 0xCC)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 11
+TOTAL = 7
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -159,7 +159,7 @@ def build():
         rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  11 页平台版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  7 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
@@ -284,53 +284,9 @@ def build():
         13, BODY)
     footer(s, 6, "接口")
 
-    # 7 预测实现
+    # 7 代际演进
     s = blank_slide(prs)
-    header(s, "6  预测实现", "TimesFM-3 式：CPM 一次前向出 9 分位数",
-           "预测是平台原生能力；接口固定，底座可换。")
-    preds = [
-        ("输入", "历史段 ≤ 15,360；变元 ≤ 32；目标 / 仅历史 / 历史+未来 三类变元。"),
-        ("特征", "pad32 → 去趋势 → RevIN → patch 192 → ResidualBlock → 1280 token。"),
-        ("特征", "20 × MixingTransformer：因果时间注意力 + 变元注意力 + FFN。"),
-        ("输出头", "Linear 1280→64×9；CPM 掩码预测段；逆 RevIN；拼接任意预测长度。"),
-        ("读出", "点预测 q50；概率区间 q10–q90；MAE + 覆盖率评测。"),
-        ("替换点", "底座换 TimesFM-4 / 自研时，预测接口签名与返回结构不变。"),
-    ]
-    for i, (t, d) in enumerate(preds):
-        r, c = divmod(i, 2)
-        left = Inches(0.5 + c * 6.35)
-        top = Inches(1.5 + r * 1.55)
-        box(s, left, top, Inches(6.15), Inches(1.42), WHITE, STROKE)
-        put(s, left + Inches(0.22), top + Inches(0.15), Inches(5.7), Inches(0.35), t, 16, RED, True)
-        put(s, left + Inches(0.22), top + Inches(0.55), Inches(5.7), Inches(0.75), d, 13, BODY)
-    footer(s, 7, "预测")
-
-    # 8 分类实现
-    s = blank_slide(prs)
-    header(s, "7  分类实现", "共享特征 + 任务 token / 线性探针",
-           "分类不是 TimesFM 内建；平台用 UniTS / MOMENT 方式补。")
-    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
-    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "路 A  规则下游（零样本，示意）", 17, MUTED, True)
-    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
-        "历史段：去趋势残差 z-score。\n|z|≥3 CRITICAL，≥2 WARNING，否则 NORMAL。\n\n"
-        "未来段：观测是否落在 q10–q90 / q20–q80 外。\n\n"
-        "不改权重，不能注册新类别，只能做异常示意。",
-        14, BODY)
-    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), RED)
-    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "路 B  可学习分类（平台接口）", 17, RED, True)
-    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
-        "UniTS：任务 token 把预测 / 分类 / 填补 / 异常收进同一套参数。\n"
-        "MOMENT：掩码预训练编码器 + 线性探针 / 分类头。\n"
-        "LIMU-BERT-X：IMU 掩码预训练，直接初始化 IMU 变元。\n\n"
-        "场景方注册类别 → 平台微调分类接口 → 返回类别 + 置信度。",
-        14, BODY)
-    footer(s, 8, "分类")
-
-    # 9 代际演进
-    s = blank_slide(prs)
-    header(s, "8  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
+    header(s, "6  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
@@ -350,51 +306,7 @@ def build():
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
         "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
-    footer(s, 9, "代际演进")
-
-    # 10 评测与许可
-    s = blank_slide(prs)
-    header(s, "9  评测与许可", "同一接口，同一评测，不同底座可对比",
-           "平台提供统一评测工具链；许可边界随底座变化。")
-    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), GREEN)
-    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "评测接口", 17, GREEN, True)
-    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.5),
-        "预测：MAE、q10–q90 覆盖率、长时域拼接稳定性。\n"
-        "分类：宏 F1、混淆矩阵、注册类别一致性。\n"
-        "底座对比：同一批数据，同一接口，换底座重跑。",
-        14, BODY)
-    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), ORANGE)
-    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "许可边界", 17, ORANGE, True)
-    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.5),
-        "TimesFM-3 权重：NC，商用必须自训底座。\n"
-        "TimesFM ≤ 2.5：Apache-2.0，可商用。\n"
-        "UniTS / MOMENT：MIT，可商用。\n"
-        "Moirai 权重 / Meta EMG：CC-BY-NC，仅研究。\n\n"
-        "平台不绑定任何 NC 权重；接口层与许可层解耦。",
-        14, BODY)
-    footer(s, 10, "评测与许可")
-
-    # 11 决策
-    s = blank_slide(prs)
-    header(s, "决策", "平台交付接口与工具链，不交付场景语义",
-           "痛点驱动：统一特征 + 统一接口；底座可换，代际演进向下兼容。")
-    lines = [
-        ("痛点", "多模态融合不足、多设备自适应困难、多任务泛化弱 → 统一特征 + 统一接口。"),
-        ("接口", "接入规格 + 预测接口 + 分类接口；版本化，向下兼容。"),
-        ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 覆盖率。"),
-        ("分类", "UniTS 任务 token / MOMENT 线性探针；场景方注册类别，平台微调。"),
-        ("演进", "零样本基线 → 千人千面 → Token 嵌入大模型；接口不变。"),
-        ("许可", "3.0 权重 NC；≤2.5 Apache；UniTS / MOMENT MIT；平台层与许可层解耦。"),
-        ("不做", "场景 Pack、整机、芯片、自建大模型、世界视频、把 TimesFM 当分类模型宣传。"),
-    ]
-    for i, (k, v) in enumerate(lines):
-        top = Inches(1.42 + i * 0.76)
-        box(s, Inches(0.5), top, Inches(12.3), Inches(0.68), WHITE if i % 2 == 0 else CARD, STROKE)
-        put(s, Inches(0.7), top, Inches(1.6), Inches(0.68), k, 16, RED, True, valign=MSO_ANCHOR.MIDDLE)
-        put(s, Inches(2.5), top, Inches(10.1), Inches(0.68), v, 13, NAVY, valign=MSO_ANCHOR.MIDDLE)
-    footer(s, 11, "决策")
+    footer(s, 7, "代际演进")
 
     try:
         prs.save(OUT)
