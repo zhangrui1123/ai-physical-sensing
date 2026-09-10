@@ -143,11 +143,11 @@ def build():
         "华为内部立项  ·  痛点驱动：多模态 · 多设备 · 多场景", 14, RED, True)
     put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
     put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
-        "接入规格 → 共享表征 → 预测 / 分类双接口，不做场景应用", 18, BODY)
+        "接入规格 → 共享特征 → 预测 / 分类双接口，不做场景应用", 18, BODY)
     box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.2), CARD, STROKE)
     put(s, Inches(0.95), Inches(3.25), Inches(11.4), Inches(0.95),
         "三大痛点：多模态融合不足、多设备自适应困难、多任务多场景泛化弱。\n"
-        "平台对策：统一 patch token 表征 + 统一推理接口；底座可换，接口不变。",
+        "平台对策：统一 patch token 特征 + 统一推理接口；底座可换，接口不变。",
         15, BODY)
     for i, (k, v) in enumerate([
         ("痛点", "多模态 · 多设备 · 多场景"),
@@ -165,7 +165,7 @@ def build():
 
     # 2 业务痛点
     s = blank_slide(prs)
-    header(s, "1  业务痛点", "三个痛点，一个根因：缺统一表征与统一接口",
+    header(s, "1  业务痛点", "三个痛点，一个根因：缺统一特征与统一接口",
            "来自一线业务复盘；每个痛点都对应后文一类模型能力。")
     pains = [
         ("痛点一\n多模态融合不足", "异构模态缺乏统一对齐。\nIMU / EMG / TP 各自建模：量纲、采样率、时钟不一致；\n跨模态信息互相看不见，融合靠人工拼特征。", RED),
@@ -180,7 +180,7 @@ def build():
         put(s, left + Inches(0.15), Inches(2.65), Inches(2.75), Inches(2.6), d, 12, BODY)
     box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "根因：没有「统一表征 + 统一接口」的物理时序底座——这正是平台的定位。",
+        "根因：没有「统一特征 + 统一接口」的物理时序底座——这正是平台的定位。",
         14, RED, True)
     footer(s, 2, "业务痛点")
 
@@ -224,7 +224,7 @@ def build():
         ("LIMU-BERT-X\n港科大+阿里巴巴\nMobiCom'25", "143 万小时 · 6 万人\n1.1K 种机型", "真实设备大规模泛化；端侧 HAR SOTA；外卖配送全国部署", "端侧"),
         ("TartanIMU\nCMU AirLab\nCVPR'25", "跨机器人 IMU\n位姿基础模型", "LoRA 仅 1.1M 参数即适配新机；200 FPS 在线推理", "机器人"),
         ("PRIMUS\nNokia Bell Labs\n+华盛顿大学 ICASSP'25", "IMU 多模态\n自监督对齐", "对齐预训练，提升下游 HAR / 健康任务", "研究"),
-        ("Babel\n微软研究院+威斯康星\n麦迪逊+港科大 SenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知表征", "研究"),
+        ("Babel\n微软研究院+威斯康星\n麦迪逊+港科大 SenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知特征", "研究"),
         ("Meta EMG\nMeta\nNature'25", "sEMG 腕带\n跨用户泛化", "0.88 手势/s；手写 20.9 WPM；个性化再 +16%", "腕带\nCC-BY-NC"),
     ]
     for i, row in enumerate(rows):
@@ -241,7 +241,7 @@ def build():
     # 5 痛点 → 方案
     s = blank_slide(prs)
     header(s, "4  痛点 → 方案", "每个痛点对应一类已验证的模型能力",
-           "平台不做场景：只把模型能力收敛成 接入 → 表征 → 预测 / 分类。")
+           "平台不做场景：只把模型能力收敛成 接入 → 特征 → 预测 / 分类。")
     rows = [
         ("多模态\n融合不足", "统一 patch token + 变元注意力：TimesFM-3 变元注意力、UniTS 任务 token；Babel 6 模态对齐作参照。\n接入规格统一时钟、量纲、质量位——对齐在进模型前完成。", RED),
         ("多设备\n自适应困难", "跨设备预训练先验：LIMU-BERT-X 覆盖 1.1K 机型、6 万人；Meta EMG 跨用户泛化。\nRevIN 实例归一 + LoRA 轻适配（TartanIMU 仅 1.1M 参数即适配新设备）。", ORANGE),
@@ -255,7 +255,7 @@ def build():
         put(s, Inches(3.8), top + Inches(0.12), Inches(8.8), Inches(1.0), v, 12, BODY)
     box(s, Inches(0.5), Inches(5.65), Inches(12.3), Inches(0.85), CARD, STROKE)
     put(s, Inches(0.7), Inches(5.78), Inches(11.9), Inches(0.62),
-        "平台边界：交付接入校验、共享表征、预测 / 分类双接口、评测工具链；不交付场景 Pack、整机、芯片。",
+        "平台边界：交付接入校验、共享特征、预测 / 分类双接口、评测工具链；不交付场景 Pack、整机、芯片。",
         13, RED, True)
     footer(s, 5, "痛点→方案")
 
@@ -280,7 +280,7 @@ def build():
     rect(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(0.08), CYAN)
     put(s, Inches(7.0), Inches(3.95), Inches(5.6), Inches(0.35), "分类（时间窗） → {类别, 置信度}", 16, CYAN, True)
     put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
-        "类别：场景方注册的类别 id\n置信度：softmax 概率\n基于共享表征 + 任务 token / 线性探针。",
+        "类别：场景方注册的类别 id\n置信度：softmax 概率\n基于共享特征 + 任务 token / 线性探针。",
         13, BODY)
     footer(s, 6, "接口")
 
@@ -291,7 +291,7 @@ def build():
     preds = [
         ("输入", "历史段 ≤ 15,360；变元 ≤ 32；目标 / 仅历史 / 历史+未来 三类变元。"),
         ("特征", "pad32 → 去趋势 → RevIN → patch 192 → ResidualBlock → 1280 token。"),
-        ("表征", "20 × MixingTransformer：因果时间注意力 + 变元注意力 + FFN。"),
+        ("特征", "20 × MixingTransformer：因果时间注意力 + 变元注意力 + FFN。"),
         ("输出头", "Linear 1280→64×9；CPM 掩码预测段；逆 RevIN；拼接任意预测长度。"),
         ("读出", "点预测 q50；概率区间 q10–q90；MAE + 覆盖率评测。"),
         ("替换点", "底座换 TimesFM-4 / 自研时，预测接口签名与返回结构不变。"),
@@ -307,7 +307,7 @@ def build():
 
     # 8 分类实现
     s = blank_slide(prs)
-    header(s, "7  分类实现", "共享表征 + 任务 token / 线性探针",
+    header(s, "7  分类实现", "共享特征 + 任务 token / 线性探针",
            "分类不是 TimesFM 内建；平台用 UniTS / MOMENT 方式补。")
     box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), MUTED)
@@ -379,9 +379,9 @@ def build():
     # 11 决策
     s = blank_slide(prs)
     header(s, "决策", "平台交付接口与工具链，不交付场景语义",
-           "痛点驱动：统一表征 + 统一接口；底座可换，代际演进向下兼容。")
+           "痛点驱动：统一特征 + 统一接口；底座可换，代际演进向下兼容。")
     lines = [
-        ("痛点", "多模态融合不足、多设备自适应困难、多任务泛化弱 → 统一表征 + 统一接口。"),
+        ("痛点", "多模态融合不足、多设备自适应困难、多任务泛化弱 → 统一特征 + 统一接口。"),
         ("接口", "接入规格 + 预测接口 + 分类接口；版本化，向下兼容。"),
         ("预测", "TimesFM-3 式 CPM 一次前向；点预测 q50；评测 MAE + 覆盖率。"),
         ("分类", "UniTS 任务 token / MOMENT 线性探针；场景方注册类别，平台微调。"),
