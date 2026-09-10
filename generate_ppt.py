@@ -24,7 +24,7 @@ ORANGE = RGBColor(0xED, 0x6D, 0x00)
 INDIGO = RGBColor(0x00, 0x74, 0xCC)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 7
+TOTAL = 9
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -159,7 +159,7 @@ def build():
         rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  7 页平台版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  9 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
@@ -238,9 +238,51 @@ def build():
     so_what(s, "平台用 LIMU-BERT-X 初始化 IMU 变元、用 Meta EMG 作 EMG 对照；底座仍是通用模型。")
     footer(s, 4, "模型盘点")
 
-    # 5 痛点 → 方案
+    # 5 TOP3 研究团队
     s = blank_slide(prs)
-    header(s, "4  痛点 → 方案", "每个痛点对应一类已验证的模型能力",
+    header(s, "4  TOP3 研究团队", "物理感知方向最值得对标的三支队伍",
+           "选型口径：有基础模型、有真实数据、有产业部署。")
+    teams = [
+        ("Google Research", "TimesFM 系列（1.0 → 3.0）。\n通用时序预测标杆：fev-bench / TIME / GIFT-Eval 三榜第一。\n平台预测底座的来源。", RED),
+        ("Mo Li 团队\n港科大/南洋理工 + 阿里巴巴", "LIMU-BERT（SenSys'21 最佳论文提名）→ LIMU-BERT-X（MobiCom'25）→ Babel（SenSys'25）。\n143 万小时真实数据；外卖配送全国部署。\n传感器基础模型从论文走到产业。", ORANGE),
+        ("Meta Reality Labs", "sEMG 神经腕带（Nature'25）。\n跨用户泛化：0.88 手势/s、手写 20.9 WPM。\n已随 Ray-Ban Display 出货——唯一规模商用的 EMG 接口。", CYAN),
+    ]
+    for i, (t, d, c) in enumerate(teams):
+        left = Inches(0.45 + i * 3.2)
+        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
+        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.75), t, 15, c, True)
+        put(s, left + Inches(0.15), Inches(2.6), Inches(2.75), Inches(2.7), d, 12, BODY)
+    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
+        "跟踪名单：CMU（MOMENT + TartanIMU）、Harvard + MIT 林肯实验室（UniTS）、Nokia Bell Labs（PRIMUS）、微软研究院（Babel）。",
+        13, BODY)
+    footer(s, 5, "TOP3 团队")
+
+    # 6 TOP3 商用场景
+    s = blank_slide(prs)
+    header(s, "5  TOP3 商用场景", "平台能力已被产业验证的三个方向",
+           "平台只提供接入 / 预测 / 分类接口；场景 Pack 由业务方交付。")
+    scenes = [
+        ("可穿戴运动健康", "传感器：IMU / EMG（手表、手环、腕带）。\n能力：手势 / 活动分类 + 生理指标预测。\n验证：Meta 腕带随 Ray-Ban Display 出货；LIMU-BERT-X 端侧 HAR。", RED),
+        ("终端情境感知", "传感器：IMU（手机、耳机）。\n能力：骑行 / 驾驶 / 跌倒识别 + 状态预测。\n验证：LIMU-BERT-X 外卖配送全国部署，6 万骑手、1.1K 种机型。", ORANGE),
+        ("工业与机器人", "传感器：IMU / TP（温度压力）。\n能力：工况分类 + 预测性维护 + 位姿估计。\n验证：TartanIMU 跨机器人平台，LoRA 1.1M 参数适配、200 FPS。", CYAN),
+    ]
+    for i, (t, d, c) in enumerate(scenes):
+        left = Inches(0.45 + i * 3.2)
+        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
+        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), t, 16, c, True)
+        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.9), d, 12, BODY)
+    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
+        "共性：三个场景都需要「预测 + 分类」同时在线，且设备 / 用户高度异构——正对应三大痛点。",
+        14, RED, True)
+    footer(s, 6, "TOP3 场景")
+
+    # 7 痛点 → 方案
+    s = blank_slide(prs)
+    header(s, "6  痛点 → 方案", "每个痛点对应一类已验证的模型能力",
            "平台不做场景：只把模型能力收敛成 接入 → 特征 → 预测 / 分类。")
     rows = [
         ("多模态\n融合不足", "统一 patch token + 变元注意力：TimesFM-3 变元注意力、UniTS 任务 token；Babel 6 模态对齐作参照。\n接入规格统一时钟、量纲、质量位——对齐在进模型前完成。", RED),
@@ -257,11 +299,11 @@ def build():
     put(s, Inches(0.7), Inches(5.78), Inches(11.9), Inches(0.62),
         "平台边界：交付接入校验、共享特征、预测 / 分类双接口、评测工具链；不交付场景 Pack、整机、芯片。",
         13, RED, True)
-    footer(s, 5, "痛点→方案")
+    footer(s, 7, "痛点→方案")
 
-    # 6 接口定义
+    # 8 接口定义
     s = blank_slide(prs)
-    header(s, "5  接口定义", "接入规格 + 预测接口 + 分类接口",
+    header(s, "7  接口定义", "接入规格 + 预测接口 + 分类接口",
            "所有输入先过接入校验；预测与分类共用同一批 patch token。")
     box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(2.0), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(0.08), RED)
@@ -282,11 +324,11 @@ def build():
     put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
         "类别：场景方注册的类别 id\n置信度：softmax 概率\n基于共享特征 + 任务 token / 线性探针。",
         13, BODY)
-    footer(s, 6, "接口")
+    footer(s, 8, "接口")
 
-    # 7 代际演进
+    # 9 代际演进
     s = blank_slide(prs)
-    header(s, "6  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
+    header(s, "8  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
@@ -306,7 +348,7 @@ def build():
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
         "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
-    footer(s, 7, "代际演进")
+    footer(s, 9, "代际演进")
 
     try:
         prs.save(OUT)
