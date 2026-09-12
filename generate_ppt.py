@@ -24,7 +24,7 @@ ORANGE = RGBColor(0xED, 0x6D, 0x00)
 INDIGO = RGBColor(0x00, 0x74, 0xCC)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 9
+TOTAL = 11
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -159,7 +159,7 @@ def build():
         rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  9 页平台版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  11 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
@@ -326,9 +326,62 @@ def build():
         13, BODY)
     footer(s, 8, "接口")
 
-    # 9 代际演进
+    # 9 接口规格（立项口径）
     s = blank_slide(prs)
-    header(s, "8  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
+    header(s, "8  接口规格", "输入输出只描述数据形态，不含场景语义",
+           "立项口径：每个字段、每个返回结构都可考核、可验收。")
+    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), RED)
+    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "输入规格（唯一入口）", 17, RED, True)
+    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.6),
+        "字段：序列 id / 时间戳 / 数值 / 量纲单位 / 质量位 / 变元角色。\n六字段缺一不可，缺即拒收。\n\n"
+        "变元：目标 / 仅历史 / 历史+未来；覆盖 IMU / EMG / TP；上限 32。\n\n"
+        "规模：历史段 ≤ 15,360 点（对齐 TimesFM-3，换底座可上调）。\n\n"
+        "采样率：档位制 10 / 50 / 100 / 200 Hz；超档自动重采样并记入质量位。",
+        13, BODY)
+    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), GREEN)
+    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "输出规格（结构冻结）", 17, GREEN, True)
+    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.6),
+        "预测接口 → {分位数 (V,H,9), 点预测 (V,H)}。\n\n"
+        "分类接口 → {类别, 置信度}；类别表由场景方注册。\n\n"
+        "场景语义（类别表 / 预测时长 / 告警阈值）不进平台接口——「平台不做场景」的落法。\n\n"
+        "版本化：接口升级向下兼容，旧调用不破坏。",
+        13, BODY)
+    footer(s, 9, "接口规格")
+
+    # 10 量化指标
+    s = blank_slide(prs)
+    header(s, "9  量化指标", "每项指标 = 基线 + 目标值 + 测量方法 + 数据集",
+           "精度 / 时延 / 功耗三层，绑定代际承诺，标杆任务锚定公开数据。")
+    cols = [(0.5, 1.3), (1.85, 2.1), (4.0, 2.7), (6.75, 3.4), (10.2, 2.6)]
+    for (cx, cw), htxt in zip(cols, ["层", "指标", "基线 / 对标", "目标值", "测量方法"]):
+        put(s, Inches(cx + 0.1), Inches(1.42), Inches(cw - 0.18), Inches(0.32), htxt, 12, MUTED, True)
+    rows = [
+        ("精度", "预测 MAE / MASE", "TimesFM-3 零样本", "持平或更优；自研 ≤ 0.95×基线", "公开 benchmark\n+ 自有数据集"),
+        ("精度", "q10–q90 覆盖率", "理论 80%", "实测 80% ± 5pp", "留出集滚动回测"),
+        ("精度", "分类宏 F1", "LIMU-BERT-X / UniTS", "零样本 ≥ 基线−5pp；百样本 ≥ 基线", "公开集 + 场景注册集"),
+        ("泛化", "跨设备/用户衰减", "单设备独立优化", "≤ 5pp；Gen2 后 ≤ 2pp", "留一交叉验证"),
+        ("时延", "端侧 p95", "TimesFM-3：M4 Max 11ms", "手机 ≤ 30ms；手表 ≤ 50ms", "真机 profiling"),
+        ("功耗", "千次推理能耗", "—（Gen3 考核）", "整机续航影响 < 1%", "功耗仪实测"),
+        ("工程", "拒收率 / 兼容性", "—", "版本升级不破坏旧调用", "工具链自动化"),
+    ]
+    for i, row in enumerate(rows):
+        top = Inches(1.8 + i * 0.62)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.56), WHITE if i % 2 == 0 else CARD, STROKE)
+        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
+            color = RED if j == 0 else (NAVY if j == 3 else BODY)
+            put(s, Inches(cx + 0.1), top + Inches(0.03), Inches(cw - 0.18), Inches(0.5), cell, 10,
+                color, j in (0, 3))
+    box(s, Inches(0.5), Inches(6.25), Inches(12.3), Inches(0.75), CARD, STROKE)
+    put(s, Inches(0.7), Inches(6.35), Inches(11.9), Inches(0.55),
+        "代际绑定：Gen1 承诺精度基线 → Gen2 承诺泛化提升 → Gen3 承诺时延功耗；标杆任务：Meta 手势 0.88/s、LIMU-BERT-X 骑手、TartanIMU 200 FPS。",
+        12, RED, True)
+    footer(s, 10, "量化指标")
+
+    # 11 代际演进
+    s = blank_slide(prs)
+    header(s, "10  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
@@ -348,7 +401,7 @@ def build():
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
         "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
-    footer(s, 9, "代际演进")
+    footer(s, 11, "代际演进")
 
     try:
         prs.save(OUT)
