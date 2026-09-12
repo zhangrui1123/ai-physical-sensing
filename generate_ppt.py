@@ -24,7 +24,7 @@ ORANGE = RGBColor(0xED, 0x6D, 0x00)
 INDIGO = RGBColor(0x00, 0x74, 0xCC)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Microsoft YaHei"
-TOTAL = 11
+TOTAL = 12
 
 
 def set_run(run, size, color, bold=False, name=FONT):
@@ -160,7 +160,7 @@ def build():
         rect(s, left, Inches(4.75), Inches(3.85), Inches(0.08), RED)
         put(s, left + Inches(0.2), Inches(4.92), Inches(3.45), Inches(0.35), k, 13, RED, True)
         put(s, left + Inches(0.2), Inches(5.35), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  11 页平台版", 12, MUTED)
+    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  12 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
@@ -351,10 +351,41 @@ def build():
         13, BODY)
     footer(s, 9, "接口规格")
 
-    # 10 量化指标
+    # 10 平台层：两接口 → 四原语 → N 特性
     s = blank_slide(prs)
-    header(s, "9  量化指标", "每项指标 = 基线 + 目标值 + 测量方法 + 数据集",
-           "精度 / 时延 / 功耗三层，绑定代际承诺，标杆任务锚定公开数据。")
+    header(s, "9  平台层", "两个接口、四种原语、N 个特性",
+           "特性爆炸的收法：不按特性抽象，按输出原语抽象；新特性 = 注册配置，不训练新模型。")
+    cols = [(0.5, 2.2), (2.75, 2.9), (5.7, 1.7), (7.45, 2.1), (9.6, 3.2)]
+    for (cx, cw), htxt in zip(cols, ["特性", "传感器", "原语", "窗口", "关键指标"]):
+        put(s, Inches(cx + 0.1), Inches(1.42), Inches(cw - 0.18), Inches(0.32), htxt, 12, MUTED, True)
+    rows = [
+        ("智感握姿", "电容阵列 + IMU + 接近光", "状态分类", "长窗 · 秒级\n带状态机", "宏 F1；切换 ≤ 200ms；\n稳态抖动率"),
+        ("敲一敲 / 划一划", "IMU + X-TAP", "事件检测", "短窗 · ~0.5s\n门控触发", "召回 @ 误报；\n触发 p95 ≤ 50ms"),
+        ("招一招 / 翻手腕", "IMU", "事件检测", "短窗 · ~0.5s\n门控触发", "召回 @ 误报；\n触发 p95 ≤ 50ms"),
+        ("智感旋转", "IMU（陀螺仪）", "连续预测", "滑动窗", "角度 MAE；\n分位数覆盖率"),
+        ("误触抑制（共用）", "全部", "置信度 / 拒识", "—", "误触 < 1 次/天"),
+    ]
+    for i, row in enumerate(rows):
+        top = Inches(1.8 + i * 0.78)
+        box(s, Inches(0.5), top, Inches(12.3), Inches(0.7), WHITE if i % 2 == 0 else CARD, STROKE)
+        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
+            if j == 0:
+                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 12, RED, True)
+            elif j == 2:
+                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 11, INDIGO, True)
+            else:
+                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 10, BODY)
+    box(s, Inches(0.5), Inches(5.85), Inches(12.3), Inches(1.05), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.97), Inches(11.9), Inches(0.85),
+        "新增特性 = 注册数据规格 + 选原语 + 类别表 / 触发阈值 + 可选 LoRA；平台承诺原语级 SLA，特性团队按配置组装。\n"
+        "握姿与敲一敲共享同一底座，差异只在窗口与类别表。",
+        13, RED, True)
+    footer(s, 10, "平台层")
+
+    # 11 量化指标
+    s = blank_slide(prs)
+    header(s, "10  量化指标", "按原语考核，不按特性考核",
+           "每项指标 = 基线 + 目标值 + 测量方法 + 数据集；特性只声明用哪个原语和目标档。")
     cols = [(0.5, 1.3), (1.85, 2.1), (4.0, 2.7), (6.75, 3.4), (10.2, 2.6)]
     for (cx, cw), htxt in zip(cols, ["层", "指标", "基线 / 对标", "目标值", "测量方法"]):
         put(s, Inches(cx + 0.1), Inches(1.42), Inches(cw - 0.18), Inches(0.32), htxt, 12, MUTED, True)
@@ -378,11 +409,11 @@ def build():
     put(s, Inches(0.7), Inches(6.35), Inches(11.9), Inches(0.55),
         "代际绑定：Gen1 承诺精度基线 → Gen2 承诺泛化提升 → Gen3 承诺时延功耗；标杆任务：智感握姿四分类（200ms）、WATCH 5 敲一敲/划一划、Meta 腕带 0.88 手势/s。",
         12, RED, True)
-    footer(s, 10, "量化指标")
+    footer(s, 11, "量化指标")
 
-    # 11 代际演进
+    # 12 代际演进
     s = blank_slide(prs)
-    header(s, "10  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
+    header(s, "11  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
@@ -402,7 +433,7 @@ def build():
     put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
         "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
         14, RED, True)
-    footer(s, 11, "代际演进")
+    footer(s, 12, "代际演进")
 
     try:
         prs.save(OUT)
