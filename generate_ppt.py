@@ -144,21 +144,22 @@ def build():
     put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
     put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
         "接入规格 → 共享特征 → 预测 / 分类双接口，不做场景应用", 18, BODY)
-    box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.2), CARD, STROKE)
-    put(s, Inches(0.95), Inches(3.25), Inches(11.4), Inches(0.95),
+    box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.45), CARD, STROKE)
+    put(s, Inches(0.95), Inches(3.22), Inches(11.4), Inches(1.25),
         "三大痛点：多模态融合不足、多设备自适应困难、多任务多场景泛化弱。\n"
-        "平台对策：统一 patch token 特征 + 统一推理接口；底座可换，接口不变。",
-        15, BODY)
+        "平台对策：统一 patch token 特征 + 统一推理接口；底座可换，接口不变。\n"
+        "首批接入特性：手机智感握姿、手表手势识别（敲一敲 / 划一划）。",
+        14, BODY)
     for i, (k, v) in enumerate([
         ("痛点", "多模态 · 多设备 · 多场景"),
         ("接口", "接入规格 + 预测 + 分类"),
         ("演进", "零样本基线 → 千人千面 → Token 嵌入大模型"),
     ]):
         left = Inches(0.7 + i * 4.05)
-        box(s, left, Inches(4.55), Inches(3.85), Inches(1.7), WHITE, STROKE)
-        rect(s, left, Inches(4.55), Inches(3.85), Inches(0.08), RED)
-        put(s, left + Inches(0.2), Inches(4.75), Inches(3.45), Inches(0.35), k, 13, RED, True)
-        put(s, left + Inches(0.2), Inches(5.2), Inches(3.45), Inches(0.85), v, 15, NAVY)
+        box(s, left, Inches(4.75), Inches(3.85), Inches(1.55), WHITE, STROKE)
+        rect(s, left, Inches(4.75), Inches(3.85), Inches(0.08), RED)
+        put(s, left + Inches(0.2), Inches(4.92), Inches(3.45), Inches(0.35), k, 13, RED, True)
+        put(s, left + Inches(0.2), Inches(5.35), Inches(3.45), Inches(0.85), v, 15, NAVY)
     put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  11 页平台版", 12, MUTED)
     put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
     put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
@@ -166,11 +167,11 @@ def build():
     # 2 业务痛点
     s = blank_slide(prs)
     header(s, "1  业务痛点", "三个痛点，一个根因：缺统一特征与统一接口",
-           "来自一线业务复盘；每个痛点都对应后文一类模型能力。")
+           "以智感握姿、手表手势两个现网特性为镜；每个痛点都对应后文一类模型能力。")
     pains = [
-        ("痛点一\n多模态融合不足", "异构模态缺乏统一对齐。\nIMU / EMG / TP 各自建模：量纲、采样率、时钟不一致；\n跨模态信息互相看不见，融合靠人工拼特征。", RED),
-        ("痛点二\n多设备自适应困难", "基于单设备独立优化。\n每款设备单独采数据、单独调参；\n换机型、换佩戴位置就要重新标定，成本线性增长。", ORANGE),
-        ("痛点三\n多任务多场景泛化弱", "算法针对特定场景设计。\n一个场景一个模型；新场景重新标注、重新训练；\n无法零样本启动，长尾场景覆盖不了。", CYAN),
+        ("痛点一\n多模态融合不足", "智感握姿靠电容阵列 + IMU + 接近光启发式拼接；\n手表 X-TAP（PPG / ECG / 触摸）与 IMU 各自为政。\n异构模态缺统一对齐，融合靠人工拼特征。", RED),
+        ("痛点二\n多设备自适应困难", "握姿仅支持部分机型（不支持直接返回 801）；\n保护壳 > 3mm、戴手套精度即掉；\nWATCH 3 与 WATCH 5 手势集不通用——每机型单独标定。", ORANGE),
+        ("痛点三\n多任务多场景泛化弱", "跑步 / 骑行 / 高尔夫 / 滑雪下手表手势失效；\n纹身、汗水、油腻场景识别率骤降；\n新场景重新标注训练，无法零样本启动。", CYAN),
     ]
     for i, (t, d, c) in enumerate(pains):
         left = Inches(0.45 + i * 3.2)
@@ -261,12 +262,12 @@ def build():
 
     # 6 TOP3 商用场景
     s = blank_slide(prs)
-    header(s, "5  TOP3 商用场景", "平台能力已被产业验证的三个方向",
+    header(s, "5  TOP3 商用场景", "首批落地：智感握姿 + 手表手势，再向外延展",
            "平台只提供接入 / 预测 / 分类接口；场景 Pack 由业务方交付。")
     scenes = [
-        ("可穿戴运动健康", "传感器：IMU / EMG（手表、手环、腕带）。\n能力：手势 / 活动分类 + 生理指标预测。\n验证：Meta 腕带随 Ray-Ban Display 出货；LIMU-BERT-X 端侧 HAR。", RED),
-        ("终端情境感知", "传感器：IMU（手机、耳机）。\n能力：骑行 / 驾驶 / 跌倒识别 + 状态预测。\n验证：LIMU-BERT-X 外卖配送全国部署，6 万骑手、1.1K 种机型。", ORANGE),
-        ("工业与机器人", "传感器：IMU / TP（温度压力）。\n能力：工况分类 + 预测性维护 + 位姿估计。\n验证：TartanIMU 跨机器人平台，LoRA 1.1M 参数适配、200 FPS。", CYAN),
+        ("手机智感握姿", "传感器：边框电容阵列 + IMU + 接近光。\n能力：左手/右手/双手/未握持四分类（200ms 内）+ 握姿切换预测。\n现网：MultimodalAwarenessKit，来电按钮跟手；仅部分机型。", RED),
+        ("手表手势识别", "传感器：IMU + X-TAP（PPG / ECG / 触摸）。\n能力：敲一敲 / 划一划 / 握拳 / 翻腕分类 + 误触抑制。\n现网：WATCH 5 首配 NPU，接电话 / 遥控拍照 / 车钥匙解锁。", ORANGE),
+        ("运动健康与工业（延展）", "传感器：IMU / TP（温度压力）。\n能力：活动识别 + 工况分类 + 预测性维护。\n验证：LIMU-BERT-X 外卖全国部署；TartanIMU 跨机器人 200 FPS。", CYAN),
     ]
     for i, (t, d, c) in enumerate(scenes):
         left = Inches(0.45 + i * 3.2)
@@ -360,9 +361,9 @@ def build():
     rows = [
         ("精度", "预测 MAE / MASE", "TimesFM-3 零样本", "持平或更优；自研 ≤ 0.95×基线", "公开 benchmark\n+ 自有数据集"),
         ("精度", "q10–q90 覆盖率", "理论 80%", "实测 80% ± 5pp", "留出集滚动回测"),
-        ("精度", "分类宏 F1", "LIMU-BERT-X / UniTS", "零样本 ≥ 基线−5pp；百样本 ≥ 基线", "公开集 + 场景注册集"),
+        ("精度", "握姿四分类 / 手势宏 F1", "现网启发式 + LIMU-BERT-X", "零样本 ≥ 基线−5pp；百样本 ≥ 基线", "公开集 + 场景注册集"),
         ("泛化", "跨设备/用户衰减", "单设备独立优化", "≤ 5pp；Gen2 后 ≤ 2pp", "留一交叉验证"),
-        ("时延", "端侧 p95", "TimesFM-3：M4 Max 11ms", "手机 ≤ 30ms；手表 ≤ 50ms", "真机 profiling"),
+        ("时延", "端侧 p95", "现网握姿 200ms", "握姿 ≤ 200ms；手表手势 p95 ≤ 50ms", "真机 profiling"),
         ("功耗", "千次推理能耗", "—（Gen3 考核）", "整机续航影响 < 1%", "功耗仪实测"),
         ("工程", "拒收率 / 兼容性", "—", "版本升级不破坏旧调用", "工具链自动化"),
     ]
@@ -375,7 +376,7 @@ def build():
                 color, j in (0, 3))
     box(s, Inches(0.5), Inches(6.25), Inches(12.3), Inches(0.75), CARD, STROKE)
     put(s, Inches(0.7), Inches(6.35), Inches(11.9), Inches(0.55),
-        "代际绑定：Gen1 承诺精度基线 → Gen2 承诺泛化提升 → Gen3 承诺时延功耗；标杆任务：Meta 手势 0.88/s、LIMU-BERT-X 骑手、TartanIMU 200 FPS。",
+        "代际绑定：Gen1 承诺精度基线 → Gen2 承诺泛化提升 → Gen3 承诺时延功耗；标杆任务：智感握姿四分类（200ms）、WATCH 5 敲一敲/划一划、Meta 腕带 0.88 手势/s。",
         12, RED, True)
     footer(s, 10, "量化指标")
 
@@ -385,9 +386,9 @@ def build():
            "接口不变，能力逐代升级；每代回答一个业务问题。")
     gens = [
         ("Gen1  零样本基线",
-         "预训练底座直接上岗。\n预测零样本（TimesFM-3）；\n分类走规则 / 线性探针（UniTS / MOMENT）。\n回答：底座行不行 → 统一评测基线。", RED),
+         "预训练底座直接上岗。\n握姿 / 手势零样本基线；\n分类走规则 / 线性探针（UniTS / MOMENT）。\n回答：底座行不行 → 统一评测基线。", RED),
         ("Gen2  千人千面",
-         "轻量适配到每设备、每用户。\nLoRA / 提示微调：TartanIMU 仅 1.1M 参数；\nMeta EMG 个性化后再 +16%。\n回答：换设备换人还行不行 → 画像进数据规格。", ORANGE),
+         "轻量适配到每设备、每用户。\n左右手习惯、佩戴松紧、手套 / 纹身 → LoRA 个性化；\nTartanIMU 仅 1.1M 参数、Meta EMG +16%。\n回答：换设备换人还行不行 → 画像进数据规格。", ORANGE),
         ("Gen3  Token 嵌入大模型",
          "物理 patch token 作为新模态注入大模型。\n预测 + 分类变成大模型的原生能力；\n平台从「提供模型」变成「提供 token 与接口」。\n回答：物理感知如何进入统一智能。", CYAN),
     ]
