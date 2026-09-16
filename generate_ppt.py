@@ -135,268 +135,258 @@ def so_what(slide, text):
 def build():
     prs = Presentation(TEMPLATE)
     delete_all_slides(prs)
+    pink = RGBColor(0xFF, 0xF0, 0xF0)
 
     # 1 封面
     s = blank_slide(prs)
     rect(s, 0, 0, Inches(0.12), prs.slide_height, RED)
-    put(s, Inches(0.7), Inches(1.25), Inches(12), Inches(0.32),
-        "华为内部立项  ·  痛点驱动：多模态 · 多设备 · 多场景", 14, RED, True)
-    put(s, Inches(0.7), Inches(1.7), Inches(12), Inches(0.7), "AI 物理感知平台", 40, NAVY, True)
-    put(s, Inches(0.7), Inches(2.5), Inches(12), Inches(0.4),
-        "接入规格 → 共享特征 → 预测 / 分类双接口，不做场景应用", 18, BODY)
-    box(s, Inches(0.7), Inches(3.1), Inches(11.9), Inches(1.45), CARD, STROKE)
-    put(s, Inches(0.95), Inches(3.22), Inches(11.4), Inches(1.25),
-        "三大痛点：多模态融合不足、多设备自适应困难、多任务多场景泛化弱。\n"
-        "平台对策：统一 patch token 特征 + 统一推理接口；底座可换，接口不变。\n"
-        "首批接入特性：手机智感握姿、手表手势识别（敲一敲 / 划一划）。",
+    put(s, Inches(0.7), Inches(1.15), Inches(12), Inches(0.3),
+        "华为内部立项  ·  从特性独立开发到统一特征底座", 14, RED, True)
+    put(s, Inches(0.7), Inches(1.55), Inches(12), Inches(0.65), "AI 物理感知平台", 40, NAVY, True)
+    put(s, Inches(0.7), Inches(2.28), Inches(12), Inches(0.38),
+        "时间序列输入  →  时空特征传感器  →  特征输出；评估时按特性训练预测头 / 分类头", 16, BODY)
+    box(s, Inches(0.7), Inches(2.85), Inches(11.9), Inches(1.35), CARD, STROKE)
+    put(s, Inches(0.95), Inches(2.98), Inches(11.4), Inches(1.15),
+        "现状：握姿、手势、旋转各自开发，模型与特征不通用，新增特性需重新训练。\n"
+        "前期：智感握姿等特性已完成单点验证，明确了「不通用」的成因。\n"
+        "本期：平台只输出特征，不承接场景；特性效果通过训练对应预测头 / 分类头评估。",
         14, BODY)
     for i, (k, v) in enumerate([
-        ("痛点", "多模态 · 多设备 · 多场景"),
-        ("接口", "接入规格 + 预测 + 分类"),
-        ("演进", "零样本基线 → 千人千面 → Token 嵌入大模型"),
+        ("现状", "各特性独立开发，特征不通用"),
+        ("前期", "智感握姿 / 手表手势完成单点验证"),
+        ("平台", "时序输入 · 特征输出 · 头仅用于评估"),
     ]):
         left = Inches(0.7 + i * 4.05)
-        box(s, left, Inches(4.75), Inches(3.85), Inches(1.55), WHITE, STROKE)
-        rect(s, left, Inches(4.75), Inches(3.85), Inches(0.08), RED)
-        put(s, left + Inches(0.2), Inches(4.92), Inches(3.45), Inches(0.35), k, 13, RED, True)
-        put(s, left + Inches(0.2), Inches(5.35), Inches(3.45), Inches(0.85), v, 15, NAVY)
-    put(s, Inches(0.7), Inches(6.5), Inches(8.5), Inches(0.3), "来源：TimesFM / UniTS / MOMENT / LIMU-BERT-X 公开资料  ·  12 页平台版", 12, MUTED)
-    put(s, Inches(10.3), Inches(6.5), Inches(2.5), Inches(0.3), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
-    put(s, Inches(0.7), Inches(6.9), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
+        box(s, left, Inches(4.45), Inches(3.85), Inches(1.55), WHITE, STROKE)
+        rect(s, left, Inches(4.45), Inches(3.85), Inches(0.08), RED)
+        put(s, left + Inches(0.2), Inches(4.62), Inches(3.45), Inches(0.35), k, 13, RED, True)
+        put(s, left + Inches(0.2), Inches(5.05), Inches(3.45), Inches(0.75), v, 15, NAVY)
+    put(s, Inches(0.7), Inches(6.25), Inches(8.5), Inches(0.28),
+        "标杆特性：手机智感握姿、手表手势（敲一敲 / 划一划）  ·  12 页", 12, MUTED)
+    put(s, Inches(10.3), Inches(6.25), Inches(2.5), Inches(0.28), f"1  /  {TOTAL}", 12, MUTED, align=PP_ALIGN.RIGHT)
+    put(s, Inches(0.7), Inches(6.65), Inches(6), Inches(0.25), "Security Level: Internal", 10, MUTED)
 
-    # 2 业务痛点
+    # 2 现状：特性独立开发
     s = blank_slide(prs)
-    header(s, "1  业务痛点", "三个痛点，一个根因：缺统一特征与统一接口",
-           "以智感握姿、手表手势两个现网特性为镜；每个痛点都对应后文一类模型能力。")
+    header(s, "1  现状", "各特性独立开发：模型与特征不通用，新增特性需重建",
+           "问题不在单点算法，而在特征与特性绑定——换一个特性就要重做一套。")
     pains = [
-        ("痛点一\n多模态融合不足", "智感握姿靠电容阵列 + IMU + 接近光启发式拼接；\n手表 X-TAP（PPG / ECG / 触摸）与 IMU 各自为政。\n异构模态缺统一对齐，融合靠人工拼特征。", RED),
-        ("痛点二\n多设备自适应困难", "握姿仅支持部分机型（不支持直接返回 801）；\n保护壳 > 3mm、戴手套精度即掉；\nWATCH 3 与 WATCH 5 手势集不通用——每机型单独标定。", ORANGE),
-        ("痛点三\n多任务多场景泛化弱", "跑步 / 骑行 / 高尔夫 / 滑雪下手表手势失效；\n纹身、汗水、油腻场景识别率骤降；\n新场景重新标注训练，无法零样本启动。", CYAN),
+        ("智感握姿  ·  独立链路", "电容阵列 + IMU + 接近光，启发式融合。\n四分类与切换，仅服务来电交互。\n特征无法复用，换机型即返回 801。", RED),
+        ("手表手势  ·  独立链路", "IMU + X-TAP 单独建模，与握姿不共享。\nWATCH 3 与 WATCH 5 手势集不通用。\n跑步 / 骑行 / 滑雪场景下整体失效。", ORANGE),
+        ("旋转 / 误触  ·  各自独立", "智感旋转基于陀螺仪，误触另设门限。\n同一只手表、同一路 IMU，特征不能复用。\n新增特性 = 新模型 + 新数据 + 新标定。", CYAN),
     ]
     for i, (t, d, c) in enumerate(pains):
-        left = Inches(0.45 + i * 3.2)
-        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
-        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.75), t, 15, c, True)
-        put(s, left + Inches(0.15), Inches(2.65), Inches(2.75), Inches(2.6), d, 12, BODY)
-    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "根因：没有「统一特征 + 统一接口」的物理时序底座——这正是平台的定位。",
+        left = Inches(0.45 + i * 4.25)
+        box(s, left, Inches(1.55), Inches(4.1), Inches(3.7), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(4.1), Inches(0.08), c)
+        put(s, left + Inches(0.16), Inches(1.78), Inches(3.78), Inches(0.5), t, 15, c, True)
+        put(s, left + Inches(0.16), Inches(2.4), Inches(3.78), Inches(2.6), d, 13, BODY)
+    box(s, Inches(0.5), Inches(5.45), Inches(12.3), Inches(0.75), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.55), Inches(11.9), Inches(0.55),
+        "共性：输入都是时间序列，输出却是绑死的标签。缺的不是再做一个特性模型，是中间那一层通用特征。",
         14, RED, True)
-    footer(s, 2, "业务痛点")
+    footer(s, 2, "现状")
 
-    # 3 模型盘点·通用时序
+    # 3 前期工作
     s = blank_slide(prs)
-    header(s, "2  模型盘点 · 通用时序", "通用时序基础模型：预测强，分类只有两家原生支持",
-           "口径：预训练目标决定原生能力；TimesFM / Chronos / Moirai 都只做预测。")
-    cols = [(0.5, 2.5), (3.05, 2.5), (5.6, 3.6), (9.25, 1.4), (10.7, 2.1)]
-    for (cx, cw), htxt in zip(cols, ["模型 / 作者单位", "预训练目标", "原生能力", "分类", "许可"]):
-        put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
-    rows = [
-        ("TimesFM-3\nGoogle Research\nICML'24 / 3.0 2026", "decoder-only\n分位数回归", "多变量预测 + 协变量；\nCPM 一次前向出 9 分位", "✗ 规则/加头", "3.0 权重 NC\n≤2.5 Apache"),
-        ("Chronos\nAmazon Science\nICML'24", "离散 token\nT5 式 NTP", "单变量概率预测", "✗", "Apache-2.0"),
-        ("Moirai\nSalesforce AI Research\nICML'24", "masked encoder\nany-variate", "多变量概率预测", "✗", "代码 Apache\n权重 CC-BY-NC"),
-        ("UniTS\nHarvard + MIT Lincoln Lab\nNeurIPS'24", "任务 token\nGEN/CLS 共享参数", "预测+分类+填补+异常一体；\n38 个数据集对比领先", "✓ 原生", "MIT"),
-        ("MOMENT\nCMU Auton Lab\nICML'24", "掩码 patch 重建\nT5 encoder", "预测/分类/异常/填补；\n线性探针即用", "✓ 探针", "MIT"),
+    header(s, "2  前期工作", "智感握姿等特性已完成单点验证，并定位了「不通用」的成因",
+           "前期工作的价值在于：单特性已可商用，同时明确了特征无法跨特性复用。")
+    works = [
+        ("智感握姿", RED,
+         "电容阵列 + IMU + 接近光。\n左手 / 右手 / 双手 / 未握持，200ms 内输出；支持来电交互。\n现网：MultimodalAwarenessKit，覆盖部分机型。"),
+        ("手表手势", ORANGE,
+         "IMU + X-TAP（PPG / ECG / 触摸）。\n敲一敲 / 划一划 / 翻腕，支持接电话、遥控拍照、车钥匙。\n现网：WATCH 5 首配 NPU。"),
+        ("定位的缺口", CYAN,
+         "保护壳 > 3mm、戴手套时精度下降；换机型需重新标定。\n握姿特征无法用于手势，手势特征无法用于旋转。\n新增特性仍需从零搭建完整链路。"),
     ]
-    for i, row in enumerate(rows):
-        top = Inches(1.82 + i * 0.9)
-        box(s, Inches(0.5), top, Inches(12.3), Inches(0.82), WHITE if i % 2 == 0 else CARD, STROKE)
-        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
-            if j == 0:
-                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.76), cell, 11, RED, True)
-            elif j == 3:
-                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 12,
-                    GREEN if cell.startswith("✓") else MUTED, True)
-            else:
-                put(s, Inches(cx + 0.12), top + Inches(0.06), Inches(cw - 0.2), Inches(0.72), cell, 11, BODY)
-    so_what(s, "预测底座选 TimesFM-3（多变量+协变量最强）；原生分类只有 UniTS / MOMENT——这正是双头设计的来源。")
-    footer(s, 3, "模型盘点")
-
-    # 4 模型盘点·物理传感器
-    s = blank_slide(prs)
-    header(s, "3  模型盘点 · 物理传感器", "IMU / EMG 专用模型：提供领域先验，不当平台底座",
-           "传感器模型规模小、端侧导向；与通用底座互补，不替代。")
-    cols = [(0.5, 2.6), (3.15, 3.3), (6.5, 4.4), (10.95, 1.85)]
-    for (cx, cw), htxt in zip(cols, ["模型 / 作者单位", "数据 / 预训练", "能力亮点", "部署 / 许可"]):
-        put(s, Inches(cx + 0.12), Inches(1.42), Inches(cw - 0.2), Inches(0.32), htxt, 12, MUTED, True)
-    rows = [
-        ("LIMU-BERT\n南洋理工+阿里巴巴\nSenSys'21", "IMU 三轴\n掩码预训练", "端侧 HAR 开山作；小样本迁移到手机 / 腕戴", "手机可部署"),
-        ("LIMU-BERT-X\n港科大+阿里巴巴\nMobiCom'25", "143 万小时 · 6 万人\n1.1K 种机型", "真实设备大规模泛化；端侧 HAR SOTA；外卖配送全国部署", "端侧"),
-        ("TartanIMU\nCMU AirLab\nCVPR'25", "跨机器人 IMU\n位姿基础模型", "LoRA 仅 1.1M 参数即适配新机；200 FPS 在线推理", "机器人"),
-        ("PRIMUS\nNokia Bell Labs\n+华盛顿大学 ICASSP'25", "IMU 多模态\n自监督对齐", "对齐预训练，提升下游 HAR / 健康任务", "研究"),
-        ("Babel\n微软研究院+威斯康星\n麦迪逊+港科大 SenSys'25", "6 模态对齐\nIMU 塔 = LIMU-BERT", "多模态人体感知特征", "研究"),
-        ("Meta EMG\nMeta\nNature'25", "sEMG 腕带\n跨用户泛化", "0.88 手势/s；手写 20.9 WPM；个性化再 +16%", "腕带\nCC-BY-NC"),
-    ]
-    for i, row in enumerate(rows):
-        top = Inches(1.8 + i * 0.75)
-        box(s, Inches(0.5), top, Inches(12.3), Inches(0.68), WHITE if i % 2 == 0 else CARD, STROKE)
-        for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
-            if j == 0:
-                put(s, Inches(cx + 0.12), top + Inches(0.03), Inches(cw - 0.2), Inches(0.64), cell, 10, RED, True)
-            else:
-                put(s, Inches(cx + 0.12), top + Inches(0.04), Inches(cw - 0.2), Inches(0.6), cell, 11, BODY)
-    so_what(s, "平台用 LIMU-BERT-X 初始化 IMU 变元、用 Meta EMG 作 EMG 对照；底座仍是通用模型。")
-    footer(s, 4, "模型盘点")
-
-    # 5 TOP3 研究团队
-    s = blank_slide(prs)
-    header(s, "4  TOP3 研究团队", "物理感知方向最值得对标的三支队伍",
-           "选型口径：有基础模型、有真实数据、有产业部署。")
-    teams = [
-        ("Google Research", "TimesFM 系列（1.0 → 3.0）。\n通用时序预测标杆：fev-bench / TIME / GIFT-Eval 三榜第一。\n平台预测底座的来源。", RED),
-        ("Mo Li 团队\n港科大/南洋理工 + 阿里巴巴", "LIMU-BERT（SenSys'21 最佳论文提名）→ LIMU-BERT-X（MobiCom'25）→ Babel（SenSys'25）。\n143 万小时真实数据；外卖配送全国部署。\n传感器基础模型从论文走到产业。", ORANGE),
-        ("Meta Reality Labs", "sEMG 神经腕带（Nature'25）。\n跨用户泛化：0.88 手势/s、手写 20.9 WPM。\n已随 Ray-Ban Display 出货——唯一规模商用的 EMG 接口。", CYAN),
-    ]
-    for i, (t, d, c) in enumerate(teams):
-        left = Inches(0.45 + i * 3.2)
-        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
-        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.75), t, 15, c, True)
-        put(s, left + Inches(0.15), Inches(2.6), Inches(2.75), Inches(2.7), d, 12, BODY)
-    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "跟踪名单：CMU（MOMENT + TartanIMU）、Harvard + MIT 林肯实验室（UniTS）、Nokia Bell Labs（PRIMUS）、微软研究院（Babel）。",
-        13, BODY)
-    footer(s, 5, "TOP3 团队")
-
-    # 6 TOP3 商用场景
-    s = blank_slide(prs)
-    header(s, "5  TOP3 商用场景", "首批落地：智感握姿 + 手表手势，再向外延展",
-           "平台只提供接入 / 预测 / 分类接口；场景 Pack 由业务方交付。")
-    scenes = [
-        ("手机智感握姿", "传感器：边框电容阵列 + IMU + 接近光。\n能力：左手/右手/双手/未握持四分类（200ms 内）+ 握姿切换预测。\n现网：MultimodalAwarenessKit，来电按钮跟手；仅部分机型。", RED),
-        ("手表手势识别", "传感器：IMU + X-TAP（PPG / ECG / 触摸）。\n能力：敲一敲 / 划一划 / 握拳 / 翻腕分类 + 误触抑制。\n现网：WATCH 5 首配 NPU，接电话 / 遥控拍照 / 车钥匙解锁。", ORANGE),
-        ("运动健康与工业（延展）", "传感器：IMU / TP（温度压力）。\n能力：活动识别 + 工况分类 + 预测性维护。\n验证：LIMU-BERT-X 外卖全国部署；TartanIMU 跨机器人 200 FPS。", CYAN),
-    ]
-    for i, (t, d, c) in enumerate(scenes):
-        left = Inches(0.45 + i * 3.2)
-        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
-        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), t, 16, c, True)
-        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.9), d, 12, BODY)
-    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "共性：三个场景都需要「预测 + 分类」同时在线，且设备 / 用户高度异构——正对应三大痛点。",
+    for i, (t, c, d) in enumerate(works):
+        left = Inches(0.45 + i * 4.25)
+        box(s, left, Inches(1.55), Inches(4.1), Inches(3.7), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(4.1), Inches(0.08), c)
+        put(s, left + Inches(0.16), Inches(1.78), Inches(3.78), Inches(0.45), t, 16, c, True)
+        put(s, left + Inches(0.16), Inches(2.35), Inches(3.78), Inches(2.7), d, 13, BODY)
+    box(s, Inches(0.5), Inches(5.45), Inches(12.3), Inches(0.75), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.55), Inches(11.9), Inches(0.55),
+        "前期交付的是特性算法；本期要交付的是各特性可共用的中间层——时空特征传感器。",
         14, RED, True)
-    footer(s, 6, "TOP3 场景")
+    footer(s, 3, "前期工作")
 
-    # 7 痛点 → 方案
+    # 4 平台定义
     s = blank_slide(prs)
-    header(s, "6  痛点 → 方案", "每个痛点对应一类已验证的模型能力",
-           "平台不做场景：只把模型能力收敛成 接入 → 特征 → 预测 / 分类。")
+    header(s, "3  平台定义", "平台只做一件事：把时间序列变成可复用的特征",
+           "时空特征传感器 = 同时看「时间怎么变」和「多路传感器怎么摆」。")
+    steps = [
+        ("1  输入", "时间序列信号", "序列 id / 时间戳 / 数值\n量纲 / 质量位 / 变元角色\n电容 · IMU · 接近光 · X-TAP", RED),
+        ("2  核心", "时空特征传感器", "时：窗口里信号怎么变\n空：多路传感器、阵列位置\n对齐时钟、量纲、质量位", ORANGE),
+        ("3  输出", "特征", "同一套向量，不含场景标签\n握姿、手势、旋转都吃它\n底座可换，特征形态冻结", GREEN),
+        ("4  仅评估", "预测头 / 分类头", "按特性另训一个小头\n头的分数 = 特征好不好\n头不是平台交付物", CYAN),
+    ]
+    for i, (k, t, d, c) in enumerate(steps):
+        left = Inches(0.4 + i * 3.23)
+        fill = pink if i == 1 else WHITE
+        box(s, left, Inches(1.55), Inches(3.08), Inches(3.85), fill, c)
+        rect(s, left, Inches(1.55), Inches(3.08), Inches(0.08), c)
+        put(s, left + Inches(0.14), Inches(1.72), Inches(2.8), Inches(0.32), k, 12, c, True)
+        put(s, left + Inches(0.14), Inches(2.08), Inches(2.8), Inches(0.45), t, 16, NAVY, True)
+        put(s, left + Inches(0.14), Inches(2.6), Inches(2.8), Inches(2.5), d, 13, BODY)
+    so_what(s, "平台边界：交付接入校验、时空特征传感器与特征。预测头 / 分类头仅在评测时训练，不进入平台接口。")
+    footer(s, 4, "平台定义")
+
+    # 5 输入规格
+    s = blank_slide(prs)
+    header(s, "4  输入", "入口只有一种东西：时间序列信号",
+           "不管来自握姿、手势还是旋转，先变成同一套字段，缺一不可。")
+    box(s, Inches(0.5), Inches(1.5), Inches(7.4), Inches(4.6), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(7.4), Inches(0.08), RED)
+    put(s, Inches(0.7), Inches(1.72), Inches(7.0), Inches(0.4), "六字段（缺一即拒收）", 17, RED, True)
+    put(s, Inches(0.7), Inches(2.25), Inches(7.0), Inches(3.6),
+        "序列 id：这一路信号是谁。\n"
+        "时间戳：什么时候采到的——多路要对齐。\n"
+        "数值：原始读数。\n"
+        "量纲单位：g、rad/s、pF，不能混着喂。\n"
+        "质量位：丢包、饱和、超档重采样，要记下来。\n"
+        "变元角色：目标 / 仅历史 / 历史+未来。\n\n"
+        "覆盖：IMU / 电容阵列 / 接近光 / X-TAP / EMG / TP。\n"
+        "上限：变元 ≤ 32；历史段 ≤ 15,360 点。\n"
+        "采样率档位：10 / 50 / 100 / 200 Hz。",
+        14, BODY)
+    box(s, Inches(8.1), Inches(1.5), Inches(4.7), Inches(4.6), CARD, STROKE)
+    put(s, Inches(8.3), Inches(1.72), Inches(4.3), Inches(0.4), "不进入口的东西", 17, MUTED, True)
+    put(s, Inches(8.3), Inches(2.25), Inches(4.3), Inches(3.6),
+        "左手 / 右手 / 敲一敲\n——场景标签不进平台。\n\n"
+        "来电交互、车钥匙解锁\n——应用语义不进平台。\n\n"
+        "机型名、保护壳厚度\n——可作为质量位或协变量，不作为类别。",
+        14, BODY)
+    footer(s, 5, "输入")
+
+    # 6 时空特征传感器
+    s = blank_slide(prs)
+    header(s, "5  时空特征传感器", "同时看时间怎么变、多路传感器怎么摆",
+           "这是平台唯一的核心模块；换底座可以，进出形态不能散。")
     rows = [
-        ("多模态\n融合不足", "统一 patch token + 变元注意力：TimesFM-3 变元注意力、UniTS 任务 token；Babel 6 模态对齐作参照。\n接入规格统一时钟、量纲、质量位——对齐在进模型前完成。", RED),
-        ("多设备\n自适应困难", "跨设备预训练先验：LIMU-BERT-X 覆盖 1.1K 机型、6 万人；Meta EMG 跨用户泛化。\nRevIN 实例归一 + LoRA 轻适配（TartanIMU 仅 1.1M 参数即适配新设备）。", ORANGE),
-        ("多任务多场景\n泛化弱", "零样本基座：TimesFM-3 零样本预测；UniTS 零样本多任务（预测/分类/填补/异常）。\n统一预测 / 分类接口，新场景先零样本启动，再按需微调。", CYAN),
+        ("时  ·  时间维", "把一段窗口切成 patch，看信号怎么随时间变。\n握姿是秒级稳态，敲一敲是 0.5s 脉冲——同一套特征，窗口不同。", RED),
+        ("空  ·  传感器维", "电容阵列有位置，IMU 有三轴，接近光 / X-TAP 是另一路。\n变元注意力自动学习多路信号的关联，不再人工拼接特征。", ORANGE),
+        ("对齐先于模型", "时钟、量纲、质量位在进传感器之前完成。\n多路信号若未对齐，再强的模型也只能处理噪声。", CYAN),
     ]
     for i, (k, v, c) in enumerate(rows):
         top = Inches(1.5 + i * 1.35)
         box(s, Inches(0.5), top, Inches(12.3), Inches(1.22), WHITE, STROKE)
         rect(s, Inches(0.5), top, Inches(0.1), Inches(1.22), c)
-        put(s, Inches(0.78), top + Inches(0.14), Inches(2.8), Inches(0.95), k, 15, c, True)
-        put(s, Inches(3.8), top + Inches(0.12), Inches(8.8), Inches(1.0), v, 12, BODY)
-    box(s, Inches(0.5), Inches(5.65), Inches(12.3), Inches(0.85), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.78), Inches(11.9), Inches(0.62),
-        "平台边界：交付接入校验、共享特征、预测 / 分类双接口、评测工具链；不交付场景 Pack、整机、芯片。",
-        13, RED, True)
-    footer(s, 7, "痛点→方案")
+        put(s, Inches(0.78), top + Inches(0.14), Inches(2.6), Inches(0.95), k, 16, c, True)
+        put(s, Inches(3.5), top + Inches(0.16), Inches(9.05), Inches(0.95), v, 14, BODY)
+    box(s, Inches(0.5), Inches(5.65), Inches(12.3), Inches(0.55), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.72), Inches(11.9), Inches(0.42),
+        "公开依据：TimesFM-3 变元注意力、UniTS 任务 token、LIMU-BERT-X 跨 1.1K 机型、Babel 6 模态对齐。",
+        13, BODY)
+    footer(s, 6, "特征传感器")
 
-    # 8 接口定义
+    # 7 输出：特征
     s = blank_slide(prs)
-    header(s, "7  接口定义", "接入规格 + 预测接口 + 分类接口",
-           "所有输入先过接入校验；预测与分类共用同一批 patch token。")
-    box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(2.0), WHITE, STROKE)
+    header(s, "6  输出", "平台出口是特征，不是左手 / 敲一敲 / 转了多少度",
+           "场景语义留在特性侧；特征形态冻结，换底座旧调用还能接。")
+    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.55), WHITE, STROKE)
+    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), GREEN)
+    put(s, Inches(0.7), Inches(1.72), Inches(5.7), Inches(0.4), "交什么（特征）", 17, GREEN, True)
+    put(s, Inches(0.7), Inches(2.25), Inches(5.7), Inches(3.5),
+        "一段窗口 → 一组向量（patch token）。\n\n"
+        "同一套特征同时喂给：\n握姿分类头、手势分类头、旋转预测头。\n\n"
+        "结构冻结：维度、时间对齐、质量位随路。\n版本升级向下兼容。\n\n"
+        "底座（TimesFM / UniTS / 自研）可换，\n外面看到的仍是这组特征。",
+        14, BODY)
+    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.55), WHITE, STROKE)
+    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), MUTED)
+    put(s, Inches(7.0), Inches(1.72), Inches(5.6), Inches(0.4), "不交什么", 17, MUTED, True)
+    put(s, Inches(7.0), Inches(2.25), Inches(5.6), Inches(3.5),
+        "不交付左手 / 右手标签。\n不交付敲一敲触发。\n不交付来电交互。\n不交付整机、芯片、场景 Pack。\n\n"
+        "以上由特性团队负责。\n平台提供特征，特性团队训练各自的头。",
+        14, BODY)
+    footer(s, 7, "输出")
+
+    # 8 评估：训练头
+    s = blank_slide(prs)
+    header(s, "7  评估", "特征冻结，按特性训练预测头 / 分类头，头的指标即特征质量",
+           "预测头 / 分类头仅作评测探针，不作为平台交付物；头规模小，便于归因于特征。")
+    box(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(1.55), WHITE, STROKE)
     rect(s, Inches(0.5), Inches(1.5), Inches(12.3), Inches(0.08), RED)
-    put(s, Inches(0.7), Inches(1.75), Inches(11.9), Inches(0.35), "接入（数据规格） → 校验 → patch token", 16, RED, True)
-    put(s, Inches(0.7), Inches(2.2), Inches(11.9), Inches(1.1),
-        "数据规格 = {序列 id, 时间戳, 数值, 量纲单位, 质量位, 变元角色: 目标 / 仅历史 / 历史+未来}\n"
-        "校验：时钟对齐、量纲归一、质量位过滤、变元上限 32、历史段 ≤ 15,360。不合格直接拒收。",
-        13, BODY)
-    box(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(2.4), WHITE, STROKE)
-    rect(s, Inches(0.5), Inches(3.7), Inches(6.1), Inches(0.08), GREEN)
-    put(s, Inches(0.7), Inches(3.95), Inches(5.7), Inches(0.35), "预测（历史段, 预测时长） → {分位数, 点预测}", 16, GREEN, True)
-    put(s, Inches(0.7), Inches(4.45), Inches(5.7), Inches(1.4),
-        "分位数：(V, H, 9) 十分位轨迹\n点预测：(V, H) 中位数 q50\n一次前向，CPM 非自回归；可拼接任意预测长度。",
-        13, BODY)
-    box(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(2.4), WHITE, STROKE)
-    rect(s, Inches(6.8), Inches(3.7), Inches(6.0), Inches(0.08), CYAN)
-    put(s, Inches(7.0), Inches(3.95), Inches(5.6), Inches(0.35), "分类（时间窗） → {类别, 置信度}", 16, CYAN, True)
-    put(s, Inches(7.0), Inches(4.45), Inches(5.6), Inches(1.4),
-        "类别：场景方注册的类别 id\n置信度：softmax 概率\n基于共享特征 + 任务 token / 线性探针。",
-        13, BODY)
-    footer(s, 8, "接口")
+    put(s, Inches(0.7), Inches(1.7), Inches(11.9), Inches(1.2),
+        "评测协议：冻结时空特征传感器（不调整或仅允许极小适配）→ 按特性训练线性探针 / 浅层头 → 在冻结集上评分。\n"
+        "对照基线 = 前期手工算法（握姿启发式、手表现网手势）。同一数据下，头指标更优才说明特征更优。\n"
+        "更换特性只更换头、不更换特征；若换头后指标显著下降，说明特征未通用，而非头训练不足。",
+        14, BODY)
+    heads = [
+        ("分类头  ·  握姿", "四分类：左 / 右 / 双手 / 未握持\n看宏 F1、切换是否 ≤ 200ms", RED),
+        ("分类头  ·  手势", "敲一敲 / 划一划 / 翻腕 + 拒识\n看召回 @ 误报、p95 ≤ 50ms", ORANGE),
+        ("预测头  ·  旋转 / 切换", "下一时刻角度或握姿切换\n看 MAE、分位数覆盖率", CYAN),
+    ]
+    for i, (t, d, c) in enumerate(heads):
+        left = Inches(0.5 + i * 4.2)
+        box(s, left, Inches(3.25), Inches(4.0), Inches(1.85), WHITE, STROKE)
+        rect(s, left, Inches(3.25), Inches(4.0), Inches(0.08), c)
+        put(s, left + Inches(0.16), Inches(3.42), Inches(3.68), Inches(0.4), t, 15, c, True)
+        put(s, left + Inches(0.16), Inches(3.88), Inches(3.68), Inches(1.05), d, 13, BODY)
+    so_what(s, "平台验收不看「再交付一个握姿模型」，看「同一套特征更换头后，仍优于前期单点方案」。")
+    footer(s, 8, "评估")
 
-    # 9 接口规格（立项口径）
+    # 9 标杆特性：前期 vs 本期
     s = blank_slide(prs)
-    header(s, "8  接口规格", "输入输出只描述数据形态，不含场景语义",
-           "立项口径：每个字段、每个返回结构都可考核、可验收。")
-    box(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(0.5), Inches(1.5), Inches(6.1), Inches(0.08), RED)
-    put(s, Inches(0.7), Inches(1.75), Inches(5.7), Inches(0.4), "输入规格（唯一入口）", 17, RED, True)
-    put(s, Inches(0.7), Inches(2.3), Inches(5.7), Inches(3.6),
-        "字段：序列 id / 时间戳 / 数值 / 量纲单位 / 质量位 / 变元角色。\n六字段缺一不可，缺即拒收。\n\n"
-        "变元：目标 / 仅历史 / 历史+未来；覆盖 IMU / EMG / TP；上限 32。\n\n"
-        "规模：历史段 ≤ 15,360 点（对齐 TimesFM-3，换底座可上调）。\n\n"
-        "采样率：档位制 10 / 50 / 100 / 200 Hz；超档自动重采样并记入质量位。",
-        13, BODY)
-    box(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(4.6), WHITE, STROKE)
-    rect(s, Inches(6.8), Inches(1.5), Inches(6.0), Inches(0.08), GREEN)
-    put(s, Inches(7.0), Inches(1.75), Inches(5.6), Inches(0.4), "输出规格（结构冻结）", 17, GREEN, True)
-    put(s, Inches(7.0), Inches(2.3), Inches(5.6), Inches(3.6),
-        "预测接口 → {分位数 (V,H,9), 点预测 (V,H)}。\n\n"
-        "分类接口 → {类别, 置信度}；类别表由场景方注册。\n\n"
-        "场景语义（类别表 / 预测时长 / 告警阈值）不进平台接口——「平台不做场景」的落法。\n\n"
-        "版本化：接口升级向下兼容，旧调用不破坏。",
-        13, BODY)
-    footer(s, 9, "接口规格")
-
-    # 10 平台层：两接口 → 四种能力 → N 特性
-    s = blank_slide(prs)
-    header(s, "9  平台层", "两个接口、四种能力、N 个特性",
-           "特性爆炸的收法：不按特性抽象，按输出能力抽象；新特性 = 注册配置，不训练新模型。")
-    cols = [(0.5, 2.2), (2.75, 2.9), (5.7, 1.7), (7.45, 2.1), (9.6, 3.2)]
-    for (cx, cw), htxt in zip(cols, ["特性", "传感器", "能力类型", "窗口", "关键指标"]):
+    header(s, "8  标杆接入", "前期特性保留，改为「共用特征 + 各自的头」",
+           "握姿、手势、旋转仍作为验收场景；变化在中间层，不在场景本身。")
+    cols = [(0.5, 2.3), (2.85, 3.2), (6.15, 3.15), (9.4, 3.4)]
+    for (cx, cw), htxt in zip(cols, ["特性", "前期（独立开发）", "本期（平台）", "评估头 / 指标"]):
         put(s, Inches(cx + 0.1), Inches(1.42), Inches(cw - 0.18), Inches(0.32), htxt, 12, MUTED, True)
     rows = [
-        ("智感握姿", "电容阵列 + IMU + 接近光", "状态分类", "长窗 · 秒级\n带状态机", "宏 F1；切换 ≤ 200ms；\n稳态抖动率"),
-        ("敲一敲 / 划一划", "IMU + X-TAP", "事件检测", "短窗 · ~0.5s\n门控触发", "召回 @ 误报；\n触发 p95 ≤ 50ms"),
-        ("招一招 / 翻手腕", "IMU", "事件检测", "短窗 · ~0.5s\n门控触发", "召回 @ 误报；\n触发 p95 ≤ 50ms"),
-        ("智感旋转", "IMU（陀螺仪）", "连续预测", "滑动窗", "角度 MAE；\n分位数覆盖率"),
-        ("误触抑制（共用）", "全部", "置信度 / 拒识", "—", "误触 < 1 次/天"),
+        ("智感握姿", "电容+IMU+光启发式\n特征无法复用", "同一套时空特征\n秒级窗口", "分类头 · 四分类\n宏 F1；切换 ≤ 200ms"),
+        ("敲一敲 / 划一划", "IMU+X-TAP 独立建模\n与握姿不共享", "同一套时空特征\n短脉冲窗口", "分类头 · 事件+拒识\n召回 @ 误报；p95 ≤ 50ms"),
+        ("招一招 / 翻手腕", "每只手表单独标定", "换头不换特征", "分类头 · 事件\n跨机型衰减 ≤ 5pp"),
+        ("智感旋转", "陀螺仪独立链路", "同一套特征用于预测", "预测头 · 连续量\n角度 MAE"),
+        ("误触抑制", "各链路单独设门限", "基于特征的置信度", "拒识头 · 共用\n误触 < 1 次/天"),
     ]
     for i, row in enumerate(rows):
         top = Inches(1.8 + i * 0.78)
         box(s, Inches(0.5), top, Inches(12.3), Inches(0.7), WHITE if i % 2 == 0 else CARD, STROKE)
         for j, ((cx, cw), cell) in enumerate(zip(cols, row)):
-            if j == 0:
-                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 12, RED, True)
-            elif j == 2:
-                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 11, INDIGO, True)
-            else:
-                put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 10, BODY)
-    box(s, Inches(0.5), Inches(5.85), Inches(12.3), Inches(1.05), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.97), Inches(11.9), Inches(0.85),
-        "新增特性 = 注册数据规格 + 选能力类型 + 类别表 / 触发阈值 + 可选 LoRA；平台按能力类型定指标，特性团队按配置组装。\n"
-        "握姿与敲一敲共享同一底座，差异只在窗口与类别表。",
-        13, RED, True)
-    footer(s, 10, "平台层")
+            color = RED if j == 0 else (NAVY if j == 2 else BODY)
+            put(s, Inches(cx + 0.1), top + Inches(0.04), Inches(cw - 0.18), Inches(0.62), cell, 12,
+                color, j in (0, 2))
+    footer(s, 9, "标杆")
+
+    # 10 新特性怎么上
+    s = blank_slide(prs)
+    header(s, "9  新特性接入", "新特性 = 注册时序 + 训练一个头，不再重建完整链路",
+           "时空特征传感器保持冻结；特性团队仅需确定窗口、类别表及预测头 / 分类头类型。")
+    steps = [
+        ("① 接入时序", "按六字段注册该路信号。\n电容、IMU、X-TAP 均可接入。", RED),
+        ("② 输出特征", "复用已上线的时空特征传感器。\n不重新训练底座。", ORANGE),
+        ("③ 训练头评估", "分类头或预测头，线性探针即可起步。\n指标达标方可准入。", GREEN),
+        ("④ 特性侧组装", "窗口、类别表、拒识门限由特性侧定义。\n平台不承接场景语义。", CYAN),
+    ]
+    for i, (t, d, c) in enumerate(steps):
+        left = Inches(0.45 + i * 3.2)
+        box(s, left, Inches(1.55), Inches(3.05), Inches(3.55), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
+        put(s, left + Inches(0.15), Inches(1.75), Inches(2.75), Inches(0.45), t, 16, c, True)
+        put(s, left + Inches(0.15), Inches(2.3), Inches(2.75), Inches(2.5), d, 14, BODY)
+    box(s, Inches(0.5), Inches(5.3), Inches(12.3), Inches(0.9), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.42), Inches(11.9), Inches(0.7),
+        "与前期差别：前期每新增一个特性，需重做模型、特征与标定；本期每新增一个特性，仅增加一个头。若头无法达标，回溯优化特征传感器，而非另立特性项目。",
+        14, RED, True)
+    footer(s, 10, "新特性")
 
     # 11 量化指标
     s = blank_slide(prs)
-    header(s, "10  量化指标", "按能力考核，不按特性考核",
-           "每项指标 = 基线 + 目标值 + 测量方法 + 数据集；特性只声明用哪种能力和目标档。")
-    cols = [(0.5, 1.3), (1.85, 2.1), (4.0, 2.7), (6.75, 3.4), (10.2, 2.6)]
-    for (cx, cw), htxt in zip(cols, ["层", "指标", "基线 / 对标", "目标值", "测量方法"]):
+    header(s, "10  量化指标", "考核对象为特征，指标通过对应的头体现",
+           "每项均为「冻结特征 + 对应的头」。基线 = 前期独立开发的手工算法。")
+    cols = [(0.5, 1.3), (1.85, 2.3), (4.2, 2.6), (6.85, 3.3), (10.2, 2.6)]
+    for (cx, cw), htxt in zip(cols, ["层", "指标", "基线 / 对标", "目标值", "怎么测"]):
         put(s, Inches(cx + 0.1), Inches(1.42), Inches(cw - 0.18), Inches(0.32), htxt, 12, MUTED, True)
     rows = [
-        ("精度", "预测 MAE / MASE", "TimesFM-3 零样本", "持平或更优；自研 ≤ 0.95×基线", "公开 benchmark\n+ 自有数据集"),
-        ("精度", "q10–q90 覆盖率", "理论 80%", "实测 80% ± 5pp", "留出集滚动回测"),
-        ("精度", "握姿四分类 / 手势宏 F1", "现网启发式 + LIMU-BERT-X", "零样本 ≥ 基线−5pp；百样本 ≥ 基线", "公开集 + 场景注册集"),
-        ("泛化", "跨设备/用户衰减", "单设备独立优化", "≤ 5pp；Gen2 后 ≤ 2pp", "留一交叉验证"),
-        ("时延", "端侧 p95", "现网握姿 200ms", "握姿 ≤ 200ms；手表手势 p95 ≤ 50ms", "真机 profiling"),
-        ("功耗", "千次推理能耗", "—（Gen3 考核）", "整机续航影响 < 1%", "功耗仪实测"),
-        ("工程", "拒收率 / 兼容性", "—", "版本升级不破坏旧调用", "工具链自动化"),
+        ("特征", "握姿分类头 宏 F1", "前期启发式握姿", "≥ 前期；关键场景冲 99%", "冻结特征 + 四分类头"),
+        ("特征", "手势分类头 宏 F1", "WATCH 5 现网手势", "≥ 前期；误触 < 1 次/天", "冻结特征 + 事件头"),
+        ("特征", "旋转预测头 MAE", "前期陀螺仪单链", "持平或更优", "冻结特征 + 预测头"),
+        ("通用", "换头掉分", "各特性独立模型", "换头不换特征，掉分 ≤ 5pp", "握姿特征直接挂手势头"),
+        ("泛化", "跨机型 / 跨用户", "单机单独标定", "衰减 ≤ 5pp；Gen2 ≤ 2pp", "留一交叉验证"),
+        ("时延", "特征 + 头 端侧 p95", "现网握姿 200ms", "握姿 ≤ 200ms；手势 ≤ 50ms", "真机 profiling"),
+        ("工程", "特征形态兼容", "—", "换底座不破坏旧调用", "工具链回归"),
     ]
     for i, row in enumerate(rows):
         top = Inches(1.8 + i * 0.62)
@@ -407,31 +397,31 @@ def build():
                 color, j in (0, 3))
     box(s, Inches(0.5), Inches(6.25), Inches(12.3), Inches(0.75), CARD, STROKE)
     put(s, Inches(0.7), Inches(6.35), Inches(11.9), Inches(0.55),
-        "代际绑定：Gen1 承诺精度基线 → Gen2 承诺泛化提升 → Gen3 承诺时延功耗；标杆任务：智感握姿四分类（200ms）、WATCH 5 敲一敲/划一划、Meta 腕带 0.88 手势/s。",
+        "验收标准：同一套特征分别训练握姿头与手势头，均优于前期单点方案——方为通用，而非再交付两个特性模型。",
         12, RED, True)
     footer(s, 11, "量化指标")
 
     # 12 代际演进
     s = blank_slide(prs)
-    header(s, "11  代际演进", "Gen1 零样本基线 → Gen2 千人千面 → Gen3 Token 嵌入大模型",
-           "接口不变，能力逐代升级；每代回答一个业务问题。")
+    header(s, "11  代际演进", "特征先通用，再覆盖到人与设备，最终成为大模型可用的 token",
+           "每代升级的是时空特征传感器；头可替换重训，特征形态保持稳定。")
     gens = [
-        ("Gen1  零样本基线",
-         "预训练底座直接上岗。\n握姿 / 手势零样本基线；\n分类走规则 / 线性探针（UniTS / MOMENT）。\n回答：底座行不行 → 统一评测基线。", RED),
-        ("Gen2  千人千面",
-         "轻量适配到每设备、每用户。\n左右手习惯、佩戴松紧、手套 / 纹身 → LoRA 个性化；\nTartanIMU 仅 1.1M 参数、Meta EMG +16%。\n回答：换设备换人还行不行 → 画像进数据规格。", ORANGE),
-        ("Gen3  Token 嵌入大模型",
-         "物理 patch token 作为新模态注入大模型。\n预测 + 分类变成大模型的原生能力；\n平台从「提供模型」变成「提供 token 与接口」。\n回答：物理感知如何进入统一智能。", CYAN),
+        ("Gen1  特征通用",
+         "时空特征传感器上线。\n握姿 / 手势通过线性探针头验收。\n优于前期单点，方为通用起步。\n回答：一套特征能否支撑多个特性。", RED),
+        ("Gen2  跨设备跨人通用",
+         "左右手、保护壳、手套、佩戴松紧纳入特征。\nLoRA 仅做特征侧轻量适配，不重建特性链路。\n跨机型衰减收紧至 ≤ 2pp。\n回答：换设备换人，是否仍需重训。", ORANGE),
+        ("Gen3  特征接入大模型",
+         "物理特征作为新模态注入大模型。\n特性头可进一步简化，甚至不再独立存在。\n平台从「提供特征」演进为「提供 token」。\n回答：物理感知如何进入统一智能。", CYAN),
     ]
     for i, (t, d, c) in enumerate(gens):
-        left = Inches(0.45 + i * 3.2)
-        box(s, left, Inches(1.55), Inches(3.05), Inches(3.9), WHITE, STROKE)
-        rect(s, left, Inches(1.55), Inches(3.05), Inches(0.08), c)
-        put(s, left + Inches(0.15), Inches(1.8), Inches(2.75), Inches(0.4), t, 16, c, True)
-        put(s, left + Inches(0.15), Inches(2.35), Inches(2.75), Inches(2.9), d, 12, BODY)
-    box(s, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.9), CARD, STROKE)
-    put(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(0.6),
-        "演进原则：接口（接入 / 预测 / 分类）向下兼容；底座、权重、头可独立替换。",
+        left = Inches(0.45 + i * 4.25)
+        box(s, left, Inches(1.55), Inches(4.1), Inches(3.7), WHITE, STROKE)
+        rect(s, left, Inches(1.55), Inches(4.1), Inches(0.08), c)
+        put(s, left + Inches(0.16), Inches(1.78), Inches(3.78), Inches(0.45), t, 16, c, True)
+        put(s, left + Inches(0.16), Inches(2.35), Inches(3.78), Inches(2.7), d, 13, BODY)
+    box(s, Inches(0.5), Inches(5.45), Inches(12.3), Inches(0.75), CARD, STROKE)
+    put(s, Inches(0.7), Inches(5.55), Inches(11.9), Inches(0.55),
+        "演进原则：输入时序规格、输出特征形态向下兼容；底座和评估头可独立替换。",
         14, RED, True)
     footer(s, 12, "代际演进")
 
